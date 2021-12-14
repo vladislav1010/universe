@@ -3,16 +3,24 @@
   "name": "remix-app-template",
   "description": "",
   "scripts": {
+    "postinstall": "patch-package --patch-dir other/patches && remix setup",
     "prebuild": "npm run clean && echo All clean ✨",
-    "clean": "rimraf ./node_modules/.cache ./build ./public/build \"./app/styles/**/*.css\"",
+    "clean": "rimraf ./node_modules/.cache ./server/dist ./build ./public/build \"./app/styles/**/*.css\"",
     "build:css": "postcss styles/**/*.css --base styles --dir app/styles",
     "build:css:prod": "npm run build:css -- --env production",
     "build:remix": "cross-env NODE_ENV=production dotenv -e .env remix build --sourcemap",
-    "build": "npm run build:css:prod && npm run build:remix",
+    "build:server": "node ./other/build-server.js",
+    "build": "npm run build:css:prod && npm run build:remix && npm run build:server",
+    "dev": "pm2-dev ./other/pm2.config.js",
     "start": "cross-env NODE_ENV=production node --require ./node_modules/dotenv/config ./index.js",
-    "postinstall": "remix setup node"
+    "start:mocks": "cross-env NODE_ENV=production node --require ./mocks --require ./node_modules/dotenv/config ./index.js",
+    "test": "jest",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext js,jsx,ts,tsx .",
+    "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|less|scss|ts|tsx|md|gql|graphql|mdx|vue)\"",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
+    "patch-package": "^6.4.7",
     "@prisma/client": "^3.6.0",
     "@remix-run/react": "^1.0.6",
     "@remix-run/serve": "^1.0.6",
@@ -43,7 +51,7 @@
     "autoprefixer": "^10.4.0",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^4.1.1",
-    "msw": "^0.36.3",
+    "msw": "^0.35.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
     "rimraf": "^3.0.2",
@@ -57,7 +65,8 @@
     "@types/on-finished": "^2.3.1"
   },
   "engines": {
-    "node": ">=14"
+    "node": "16",
+    "npm": "8"
   },
   "sideEffects": false
 }
