@@ -12,21 +12,24 @@ import {
   useLoaderData,
 } from "remix";
 import type { LinksFunction } from "remix";
-import globalStylesUrl from "~/styles/global.css";
-import darkStylesUrl from "~/styles/dark.css";
 import { useRemixI18Next } from "remix-i18next";
 import { i18n } from "./i18n.server";
 import Navbar from "./components/navbar";
+import tailwindStyles from "./styles/tailwind.css";
+import vendorStyles from "./styles/vendors.css";
+import appStyles from "./styles/app.css";
+import noScriptStyles from "./styles/no-script.css";
 
 // https://remix.run/api/app#links
 export let links: LinksFunction = () => {
   return [
-    { rel: "stylesheet", href: globalStylesUrl },
     {
       rel: "stylesheet",
-      href: darkStylesUrl,
-      media: "(prefers-color-scheme: dark)",
+      href: "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap",
     },
+    { rel: "stylesheet", href: vendorStyles },
+    { rel: "stylesheet", href: tailwindStyles },
+    { rel: "stylesheet", href: appStyles },
   ];
 };
 
@@ -115,7 +118,16 @@ function Document({
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         {title ? <title>{title}</title> : null}
         <Meta />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin={"anonymous"}
+        />
         <Links />
+        <noscript>
+          <link rel="stylesheet" href={noScriptStyles} />
+        </noscript>
       </head>
       <body>
         {children}
