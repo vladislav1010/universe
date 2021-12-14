@@ -24,10 +24,10 @@ export default function Navbar() {
       children: [
         { name: t("navbar.links.test.children.test1"), to: "/test/test1" },
         {
-          name: t("navbar.links.test.children.test1.children.test2.name"),
+          name: t("navbar.links.test.children.test2.name"),
           children: [
             {
-              name: t("navbar.links.test.children.test1.children.test2.test3"),
+              name: t("navbar.links.test.children.test2.children.test3"),
               to: "/test/test2/test3",
             },
           ],
