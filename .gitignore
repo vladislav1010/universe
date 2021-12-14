@@ -103,5 +103,11 @@ dist
 # TernJS port file
 .tern-port
 
-// VS Code "Local History" plugin
+# VS Code "Local History" plugin
 .history
+
+# VS Code
+.vscode/
+
+# JetBrains IDE
+.idea
