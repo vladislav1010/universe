@@ -1,17 +1,22 @@
 import {
+  json,
   Link,
   Links,
   LiveReload,
+  LoaderFunction,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch
+  useCatch,
+  useLoaderData,
 } from "remix";
 import type { LinksFunction } from "remix";
-
 import globalStylesUrl from "~/styles/global.css";
 import darkStylesUrl from "~/styles/dark.css";
+import { useRemixI18Next } from "remix-i18next";
+import { i18n } from "./i18n.server";
+import Navbar from "./components/navbar";
 
 // https://remix.run/api/app#links
 export let links: LinksFunction = () => {
@@ -20,14 +25,17 @@ export let links: LinksFunction = () => {
     {
       rel: "stylesheet",
       href: darkStylesUrl,
-      media: "(prefers-color-scheme: dark)"
-    }
+      media: "(prefers-color-scheme: dark)",
+    },
   ];
 };
 
 // https://remix.run/api/conventions#default-export
 // https://remix.run/api/conventions#route-filenames
 export default function App() {
+  let { locale } = useLoaderData<{ locale: string }>();
+  useRemixI18Next(locale);
+
   return (
     <Document>
       <Layout>
@@ -95,7 +103,7 @@ export function CatchBoundary() {
 
 function Document({
   children,
-  title
+  title,
 }: {
   children: React.ReactNode;
   title?: string;
@@ -123,6 +131,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="remix-app">
       <header className="remix-app__header">
+        <Navbar />
         <div className="container remix-app__header-content">
           <Link to="/" title="Remix" className="remix-app__header-home-link">
             <RemixLogo />
@@ -176,3 +185,8 @@ function RemixLogo() {
     </svg>
   );
 }
+
+export let loader: LoaderFunction = async ({ request }) => {
+  let locale = await i18n.getLocale(request);
+  return json({ locale });
+};
