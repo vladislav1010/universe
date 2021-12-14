@@ -76,7 +76,17 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <ul className="hidden lg:flex"></ul>
+        <ul className="hidden lg:flex">
+          {LINKS.map(link =>
+            link.to != null ? (
+              <NavLink key={link.to} to={link.to}>
+                {link.name}
+              </NavLink>
+            ) : (
+              <button key={link.name}>{link.name}</button>
+            ),
+          )}
+        </ul>
       </nav>
     </div>
   )
