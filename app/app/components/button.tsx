@@ -30,23 +30,35 @@ function LinkButton({
 
 interface ButtonProps {
   children: React.ReactNode | React.ReactNode[]
+  isRounded?: boolean
+  innerClassName?: string
 }
 
-function ButtonInner({children}: Pick<ButtonProps, 'children'>) {
+function ButtonInner({
+  children,
+  isRounded,
+  className,
+}: Pick<ButtonProps, 'children'> & {
+  isRounded: boolean
+  className: ButtonProps['innerClassName']
+}) {
   return (
     <>
       <div
         className={clsx(
-          'focus-ring absolute inset-0 rounded-full opacity-100 disabled:opacity-50 transform transition transition-ease-in',
+          'focus-ring absolute inset-0 opacity-100 disabled:opacity-50 transform transition transition-ease-in',
           'group-hover:bg-[rgba(15,48,106,.05)]',
+          {
+            'rounded-full': isRounded,
+          },
         )}
       />
 
       <div
         className={clsx(
-          'relative flex items-center justify-center w-full h-full whitespace-nowrap',
-          'px-11 py-6 space-x-5',
+          'relative flex items-center w-full h-full whitespace-nowrap',
           'text-primary',
+          className,
         )}
       >
         {children}
@@ -58,11 +70,15 @@ function ButtonInner({children}: Pick<ButtonProps, 'children'>) {
 function Button({
   children,
   className,
+  innerClassName,
+  isRounded = true,
   ...buttonProps
 }: ButtonProps & Omit<JSX.IntrinsicElements['button'], 'children'>) {
   return (
     <button {...buttonProps} className={getClassName({className})}>
-      <ButtonInner>{children}</ButtonInner>
+      <ButtonInner className={innerClassName} isRounded={isRounded}>
+        {children}
+      </ButtonInner>
     </button>
   )
 }
@@ -70,10 +86,15 @@ function Button({
 const ButtonLink = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithRef<typeof AnchorOrLink> & ButtonProps
->(function ButtonLink({children, className, ...rest}, ref) {
+>(function ButtonLink(
+  {children, className, innerClassName, isRounded = true, ...rest},
+  ref,
+) {
   return (
     <AnchorOrLink ref={ref} className={getClassName({className})} {...rest}>
-      <ButtonInner>{children}</ButtonInner>
+      <ButtonInner className={innerClassName} isRounded={isRounded}>
+        {children}
+      </ButtonInner>
     </AnchorOrLink>
   )
 })

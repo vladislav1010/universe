@@ -11,17 +11,19 @@ import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar} from '../util/css'
 
-interface NavItemBase {
+interface NavItemContent {
   name: string
+  description?: string
 }
 
-interface NavItemLink extends NavItemBase {
+interface NavItemLink extends NavItemContent {
   to: string
   children?: never
   toPrefix?: never
+  description?: string
 }
 
-interface NavItemWithSubItems extends NavItemBase {
+interface NavItemWithSubItems extends NavItemContent {
   children: NavItem[]
   toPrefix: string
   to?: never
@@ -80,6 +82,25 @@ function NavButton({
       {...buttonProps}
     />
   )
+}
+
+const navSubItemButtonOrLinkProps = {
+  innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
+  className: 'w-full',
+  isRounded: false,
+}
+
+function NavSubItemButtonOrLinkChildren({name, description}: NavItemContent) {
+  if (description != null) {
+    return (
+      <div className="flex flex-col flex-nowrap">
+        <div>{name}</div>
+        <div className="text-gray-400 text-sm">{description}</div>
+      </div>
+    )
+  } else {
+    return <>{name}</>
+  }
 }
 
 function NavButtonAndSubItemsDrawer({
@@ -156,14 +177,30 @@ function NavButtonAndSubItemsDrawer({
                     </div>
                   </Transition.Child>
                   <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
-                    <div className="mt-6 relative flex-1 px-4 sm:px-6">
-                      {subItems.map(x =>
-                        x.to != null ? (
-                          <ButtonLink to={x.to}>{x.name}</ButtonLink>
-                        ) : (
-                          <Button>{x.name}</Button>
-                        ),
-                      )}
+                    <div className="relative flex-1">
+                      <nav>
+                        <ul className="my-8 sm:my-6">
+                          {subItems.map(x => (
+                            <li
+                              className="flex flex-col flex-nowrap"
+                              key={x.to ?? x.toPrefix}
+                            >
+                              {x.to != null ? (
+                                <ButtonLink
+                                  {...navSubItemButtonOrLinkProps}
+                                  to={x.to}
+                                >
+                                  <NavSubItemButtonOrLinkChildren {...x} />
+                                </ButtonLink>
+                              ) : (
+                                <Button {...navSubItemButtonOrLinkProps}>
+                                  <NavSubItemButtonOrLinkChildren {...x} />
+                                </Button>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
                     </div>
                   </div>
                 </div>
@@ -179,18 +216,22 @@ function NavButtonAndSubItemsDrawer({
 export default function Navbar() {
   let {t} = useTranslation('common')
   const LINKS: NavItem[] = [
-    {name: t('navbar.links.services'), to: '/services'},
+    {name: t('navbar.links.services.name'), to: '/services'},
     {
       name: t('navbar.links.test.name'),
       toPrefix: '/test',
       children: [
-        {name: t('navbar.links.test.children.test1'), to: '/test/test1'},
+        {
+          name: t('navbar.links.test.children.test1.name'),
+          description: t('navbar.links.test.children.test1.description'),
+          to: '/test/test1',
+        },
         {
           name: t('navbar.links.test.children.test2.name'),
           toPrefix: '/test/test2',
           children: [
             {
-              name: t('navbar.links.test.children.test2.children.test3'),
+              name: t('navbar.links.test.children.test2.children.test3.name'),
               to: '/test/test2/test3',
             },
           ],
