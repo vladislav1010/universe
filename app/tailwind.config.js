@@ -54,7 +54,6 @@ module.exports = {
         600: 'var(--color-green-600)',
       },
     },
-
     extend: {
       zIndex: {
         '-10': '-10',

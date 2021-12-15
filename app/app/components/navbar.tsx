@@ -8,6 +8,8 @@ import {LogoIcon} from './icons/logo'
 import {LinkButton} from './button'
 import {Dialog, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
+import {TinyColor} from '@ctrl/tinycolor'
+import {cssVar} from '../util/css'
 
 interface NavItemBase {
   name: string
@@ -107,7 +109,16 @@ function NavButtonAndSubitemsDrawer(
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Overlay className="absolute inset-0 bg-gray-500/75 transition-opacity backdrop-blur-md" />
+              <Dialog.Overlay
+                className="absolute inset-0 transition-opacity backdrop-blur-md"
+                style={{
+                  backgroundColor:
+                    '#' +
+                    new TinyColor(cssVar('--color-black'))
+                      .setAlpha(0.1)
+                      .toHex8(),
+                }}
+              />
             </Transition.Child>
             <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
               <Transition.Child
