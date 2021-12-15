@@ -2,10 +2,10 @@ import * as React from 'react'
 import {Link, useLocation} from 'remix'
 import clsx from 'clsx'
 import {json, LoaderFunction} from 'remix'
-import {i18n} from '~/i18n.server'
+import {i18n} from '../i18n.server'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
-import {LinkButton} from './button'
+import {Button, ButtonLink, LinkButton} from './button'
 import {Dialog, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
@@ -18,6 +18,7 @@ interface NavItemBase {
 interface NavItemLink extends NavItemBase {
   to: string
   children?: never
+  toPrefix?: never
 }
 
 interface NavItemWithSubItems extends NavItemBase {
@@ -156,9 +157,13 @@ function NavButtonAndSubItemsDrawer({
                   </Transition.Child>
                   <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
                     <div className="mt-6 relative flex-1 px-4 sm:px-6">
-                      {subItems.map(x => (
-                        <div>{x.name}</div>
-                      ))}
+                      {subItems.map(x =>
+                        x.to != null ? (
+                          <ButtonLink to={x.to}>{x.name}</ButtonLink>
+                        ) : (
+                          <Button>{x.name}</Button>
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>
