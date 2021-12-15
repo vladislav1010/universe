@@ -1,5 +1,8 @@
 {
   "navbar": {
+    "drawer": {
+      "close": "Close"
+    },
     "links": {
       "services": "Services",
       "test": {

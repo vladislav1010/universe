@@ -81,16 +81,19 @@ function NavButton({
   )
 }
 
-function NavButtonAndSubitemsDrawer(
-  buttonProps: {
-    children: React.ReactNode
-  } & Pick<NavItemWithSubItems, 'toPrefix'>,
-) {
+function NavButtonAndSubItemsDrawer({
+  toPrefix,
+  name,
+  children: subItems,
+}: Pick<NavItemWithSubItems, 'toPrefix' | 'name' | 'children'>) {
   const {isOpen, onClose, onToggle} = useDisclosure()
+  const {t} = useTranslation('common')
 
   return (
     <>
-      <NavButton {...buttonProps} onClick={onToggle} />
+      <NavButton onClick={onToggle} toPrefix={toPrefix}>
+        {name}
+      </NavButton>
       <Transition.Root show={isOpen} as={React.Fragment}>
         <Dialog
           as="div"
@@ -145,19 +148,17 @@ function NavButtonAndSubitemsDrawer(
                         className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                         onClick={onClose}
                       >
-                        <span className="sr-only">Close panel</span>
-                        close
+                        <span className="sr-only">
+                          {t('navbar.drawer.close')}
+                        </span>
                       </button>
                     </div>
                   </Transition.Child>
                   <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
-                    <div className="px-4 sm:px-6">
-                      <Dialog.Title className="text-lg font-medium text-gray-900">
-                        text
-                      </Dialog.Title>
-                    </div>
                     <div className="mt-6 relative flex-1 px-4 sm:px-6">
-                      text
+                      {subItems.map(x => (
+                        <div>{x.name}</div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -213,9 +214,12 @@ export default function Navbar() {
                 <NavLink to={link.to}>{link.name}</NavLink>
               ) : (
                 <>
-                  <NavButtonAndSubitemsDrawer toPrefix={link.toPrefix}>
-                    {link.name}
-                  </NavButtonAndSubitemsDrawer>
+                  <NavButtonAndSubItemsDrawer
+                    toPrefix={link.toPrefix}
+                    name={link.name}
+                  >
+                    {link.children}
+                  </NavButtonAndSubItemsDrawer>
                 </>
               )}
             </li>
