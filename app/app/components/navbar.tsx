@@ -6,16 +6,25 @@ import {i18n} from '~/i18n.server'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
 import {LinkButton} from './button'
+import {Dialog, Transition} from '@headlessui/react'
+import {useDisclosure} from '@chakra-ui/hooks'
 
-type NavItem = {
+interface NavItemBase {
   name: string
-} & (
-  | {children: NavItem[]; toPrefix: string; to?: never}
-  | {
-      to: string
-      children?: never
-    }
-)
+}
+
+interface NavItemLink extends NavItemBase {
+  to: string
+  children?: never
+}
+
+interface NavItemWithSubItems extends NavItemBase {
+  children: NavItem[]
+  toPrefix: string
+  to?: never
+}
+
+type NavItem = NavItemLink | NavItemWithSubItems
 
 function getClassNavLinkOrButtonClassName({
   className,
@@ -53,21 +62,100 @@ function NavLink({
 }
 
 function NavButton({
-  children,
   toPrefix,
-}: {
-  children?: React.ReactNode
-  toPrefix: string
-}) {
+  ...buttonProps
+}: Pick<NavItemWithSubItems, 'toPrefix'> &
+  Omit<JSX.IntrinsicElements['button'], 'className'>) {
   const location = useLocation()
   const isSelected =
     toPrefix === location.pathname ||
     location.pathname.startsWith(`${toPrefix}/`)
 
   return (
-    <LinkButton className={getClassNavLinkOrButtonClassName({isSelected})}>
-      {children}
-    </LinkButton>
+    <LinkButton
+      className={getClassNavLinkOrButtonClassName({isSelected})}
+      {...buttonProps}
+    />
+  )
+}
+
+function NavButtonAndSubitemsDrawer(
+  buttonProps: {
+    children: React.ReactNode
+  } & Pick<NavItemWithSubItems, 'toPrefix'>,
+) {
+  const {isOpen, onClose, onToggle} = useDisclosure()
+
+  return (
+    <>
+      <NavButton {...buttonProps} onClick={onToggle} />
+      <Transition.Root show={isOpen} as={React.Fragment}>
+        <Dialog
+          as="div"
+          static
+          className="fixed inset-0 overflow-hidden"
+          open={isOpen}
+          onClose={onClose}
+        >
+          <div className="absolute inset-0 overflow-hidden">
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-in-out duration-500"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in-out duration-500"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Dialog.Overlay className="absolute inset-0 bg-gray-500/75 transition-opacity backdrop-blur-md" />
+            </Transition.Child>
+            <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+              <Transition.Child
+                as={React.Fragment}
+                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <div className="relative w-screen max-w-md">
+                  <Transition.Child
+                    as={React.Fragment}
+                    enter="ease-in-out duration-500"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in-out duration-500"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <div className="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4">
+                      <button
+                        className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                        onClick={onClose}
+                      >
+                        <span className="sr-only">Close panel</span>
+                        close
+                      </button>
+                    </div>
+                  </Transition.Child>
+                  <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+                    <div className="px-4 sm:px-6">
+                      <Dialog.Title className="text-lg font-medium text-gray-900">
+                        text
+                      </Dialog.Title>
+                    </div>
+                    <div className="mt-6 relative flex-1 px-4 sm:px-6">
+                      text
+                    </div>
+                  </div>
+                </div>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
   )
 }
 
@@ -109,15 +197,15 @@ export default function Navbar() {
 
         <ul className="hidden lg:flex">
           {LINKS.map(link => (
-            <li className="px-5 py-2">
+            <li className="px-5 py-2" key={link.to ?? link.toPrefix}>
               {link.to != null ? (
-                <NavLink key={link.to} to={link.to}>
-                  {link.name}
-                </NavLink>
+                <NavLink to={link.to}>{link.name}</NavLink>
               ) : (
-                <NavButton key={link.name} toPrefix={link.toPrefix}>
-                  {link.name}
-                </NavButton>
+                <>
+                  <NavButtonAndSubitemsDrawer toPrefix={link.toPrefix}>
+                    {link.name}
+                  </NavButtonAndSubitemsDrawer>
+                </>
               )}
             </li>
           ))}
