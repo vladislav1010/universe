@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
 import {Button, ButtonLink, LinkButton} from './button'
-import {Dialog, Menu, Transition} from '@headlessui/react'
+import {Dialog, Menu, Portal, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar, setCssVar} from '../util/css'
@@ -100,16 +100,13 @@ function NavSubItemButtonAndMenu({
               <NavSubItemButtonOrLinkChildren {...navItem} />
             </Button>
           </Menu.Button>
-          <MotionMenuItems
-            initial={open ? 'hidden' : 'show'}
-            variants={{
-              hidden: {transform: 'transitionX(0)'},
-              show: {transform: 'transitionX(-100%)'},
-            }}
-            animate={open ? 'show' : 'hidden'}
-            className={
-              'left-0 fixed inset-y-0 w-[20rem] bg-[#f2f4f7] ring-1 ring-black ring-opacity-5 focus:outline-none z-[-1] transform scale-100'
-            }
+          <Menu.Items
+            className={clsx(
+              'left-0 fixed inset-y-0 w-[20rem] bg-[#f2f4f7] focus:outline-none z-[-1] transform scale-100',
+              {
+                '-translate-x-full': open,
+              },
+            )}
           >
             {navItem.children.map(x => (
               <Menu.Item key={x.to}>
@@ -118,7 +115,7 @@ function NavSubItemButtonAndMenu({
                 </ButtonLink>
               </Menu.Item>
             ))}
-          </MotionMenuItems>
+          </Menu.Items>
         </>
       )}
     </Menu>
