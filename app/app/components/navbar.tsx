@@ -310,7 +310,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <div className="px-5vw py-9 lg:py-12 sticky z-1" ref={navbarRef}>
+    <div className="px-5vw py-9 lg:py-12 sticky z-[1] bg-white" ref={navbarRef}>
       <nav className="flex items-center justify-between mx-auto text-primary max-w-8xl">
         <div>
           <Link
