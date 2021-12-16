@@ -6,7 +6,7 @@ import {i18n} from '../i18n.server'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
 import {Button, ButtonLink, LinkButton} from './button'
-import {Dialog, Transition} from '@headlessui/react'
+import {Dialog, Menu, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar} from '../util/css'
@@ -23,7 +23,8 @@ interface NavItemLink extends NavItemContent {
   description?: string
 }
 
-interface NavItemWithSubItems extends NavItemContent {
+interface NavItemWithSubItems<Item extends NavItem = NavItem>
+  extends NavItemContent {
   children: NavItem[]
   toPrefix: string
   to?: never
@@ -31,7 +32,7 @@ interface NavItemWithSubItems extends NavItemContent {
 
 type NavItem = NavItemLink | NavItemWithSubItems
 
-function getClassNavLinkOrButtonClassName({
+function navLinkOrButtonClassName({
   className,
   isSelected,
 }: {
@@ -59,7 +60,7 @@ function NavLink({
   return (
     <Link
       prefetch="intent"
-      className={getClassNavLinkOrButtonClassName({isSelected})}
+      className={navLinkOrButtonClassName({isSelected})}
       to={to}
       {...rest}
     />
@@ -78,9 +79,50 @@ function NavButton({
 
   return (
     <LinkButton
-      className={getClassNavLinkOrButtonClassName({isSelected})}
+      className={navLinkOrButtonClassName({isSelected})}
       {...buttonProps}
     />
+  )
+}
+
+const menuListClassName = (className?: string) =>
+  clsx('py-8 sm:py-6', className)
+
+function NavSubItemButtonAndMenu({
+  navItem,
+}: {
+  navItem: NavItemWithSubItems<NavItemLink>
+}) {
+  return (
+    <Menu as="div" className={'relative inline-block text-left'}>
+      <Menu.Button as={React.Fragment}>
+        <Button {...navSubItemButtonOrLinkProps}>
+          <NavSubItemButtonOrLinkChildren {...navItem} />
+        </Button>
+      </Menu.Button>
+      <Transition
+        enter="transition duration-100 ease-out"
+        enterFrom="transform scale-95 opacity-0"
+        enterTo="transform scale-100 opacity-100"
+        leave="transition duration-75 ease-out"
+        leaveFrom="transform scale-100 opacity-100"
+        leaveTo="transform scale-95 opacity-0"
+      >
+        <Menu.Items
+          className={menuListClassName(
+            'top-0 left-full absolute w-64 bg-[#f2f4f7] ring-1 ring-black ring-opacity-5 focus:outline-none',
+          )}
+        >
+          {navItem.children.map(x => (
+            <Menu.Item key={x.to}>
+              <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
+                <NavSubItemButtonOrLinkChildren {...x} />
+              </ButtonLink>
+            </Menu.Item>
+          ))}
+        </Menu.Items>
+      </Transition>
+    </Menu>
   )
 }
 
@@ -145,7 +187,7 @@ function NavButtonAndSubItemsDrawer({
                 }}
               />
             </Transition.Child>
-            <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+            <div className="fixed inset-y-0 right-0 max-w-full flex">
               <Transition.Child
                 as={React.Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -176,10 +218,10 @@ function NavButtonAndSubItemsDrawer({
                       </button>
                     </div>
                   </Transition.Child>
-                  <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
+                  <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll overflow-x-auto">
                     <div className="relative flex-1">
                       <nav>
-                        <ul className="my-8 sm:my-6">
+                        <ul className={menuListClassName()}>
                           {subItems.map(x => (
                             <li
                               className="flex flex-col flex-nowrap"
@@ -193,9 +235,7 @@ function NavButtonAndSubItemsDrawer({
                                   <NavSubItemButtonOrLinkChildren {...x} />
                                 </ButtonLink>
                               ) : (
-                                <Button {...navSubItemButtonOrLinkProps}>
-                                  <NavSubItemButtonOrLinkChildren {...x} />
-                                </Button>
+                                <NavSubItemButtonAndMenu navItem={x} />
                               )}
                             </li>
                           ))}
