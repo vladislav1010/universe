@@ -88,8 +88,10 @@ const MotionMenuItems = motion(Menu.Items)
 
 function NavSubItemButtonAndMenu({
   navItem,
+  onClose,
 }: {
   navItem: NavItemWithSubItems<NavItemLink>
+  onClose: () => void
 }) {
   return (
     <Menu as="div" className={'relative inline-block text-left'}>
@@ -115,6 +117,9 @@ function NavSubItemButtonAndMenu({
                 </ButtonLink>
               </Menu.Item>
             ))}
+            <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex">
+              <CloseButton onClose={onClose} />
+            </div>
           </Menu.Items>
         </>
       )}
@@ -141,13 +146,46 @@ function NavSubItemButtonOrLinkChildren({name, description}: NavItemContent) {
   }
 }
 
+function CloseButton({
+  className,
+  onClose,
+}: {
+  onClose: () => void
+  className?: string
+}) {
+  const {t} = useTranslation('common')
+
+  return (
+    <button
+      className={clsx(
+        'border-secondary hover:border-primary focus:border-primary inline-flex items-center justify-center p-2 h-7 w-7 border-2 rounded-full focus:outline-none overflow-hidden transition',
+        className,
+      )}
+      onClick={onClose}
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        role="img"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 352 512"
+      >
+        <path
+          fill="currentColor"
+          d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+        ></path>
+      </svg>
+      <span className="sr-only">{t('navbar.drawer.close')}</span>
+    </button>
+  )
+}
+
 function NavButtonAndSubItemsDrawer({
   toPrefix,
   name,
   children: subItems,
 }: Pick<NavItemWithSubItems, 'toPrefix' | 'name' | 'children'>) {
   const {isOpen, onClose, onToggle} = useDisclosure()
-  const {t} = useTranslation('common')
 
   return (
     <>
@@ -178,7 +216,7 @@ function NavButtonAndSubItemsDrawer({
                   backgroundColor:
                     '#' +
                     new TinyColor(cssVar('--color-black'))
-                      .setAlpha(0.1)
+                      .setAlpha(0.02)
                       .toHex8(),
                 }}
               />
@@ -208,15 +246,8 @@ function NavButtonAndSubItemsDrawer({
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <div className="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4">
-                      <button
-                        className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
-                        onClick={onClose}
-                      >
-                        <span className="sr-only">
-                          {t('navbar.drawer.close')}
-                        </span>
-                      </button>
+                    <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex z-[-11]">
+                      <CloseButton onClose={onClose} />
                     </div>
                   </Transition.Child>
                   <div className="h-full flex flex-col py-6 bg-white shadow-xl">
@@ -236,7 +267,10 @@ function NavButtonAndSubItemsDrawer({
                                   <NavSubItemButtonOrLinkChildren {...x} />
                                 </ButtonLink>
                               ) : (
-                                <NavSubItemButtonAndMenu navItem={x} />
+                                <NavSubItemButtonAndMenu
+                                  navItem={x}
+                                  onClose={onClose}
+                                />
                               )}
                             </li>
                           ))}
