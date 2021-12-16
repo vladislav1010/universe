@@ -1,15 +1,14 @@
 import * as React from 'react'
 import {Link, useLocation} from 'remix'
 import clsx from 'clsx'
-import {json, LoaderFunction} from 'remix'
-import {i18n} from '../i18n.server'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
 import {Button, ButtonLink, LinkButton} from './button'
 import {Dialog, Menu, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
-import {cssVar} from '../util/css'
+import {cssVar, setCssVar} from '../util/css'
+import {animate, motion} from 'framer-motion'
 
 interface NavItemContent {
   name: string
@@ -85,8 +84,7 @@ function NavButton({
   )
 }
 
-const menuListClassName = (className?: string) =>
-  clsx('py-8 sm:py-6', className)
+const MotionMenuItems = motion(Menu.Items)
 
 function NavSubItemButtonAndMenu({
   navItem,
@@ -95,33 +93,34 @@ function NavSubItemButtonAndMenu({
 }) {
   return (
     <Menu as="div" className={'relative inline-block text-left'}>
-      <Menu.Button as={React.Fragment}>
-        <Button {...navSubItemButtonOrLinkProps}>
-          <NavSubItemButtonOrLinkChildren {...navItem} />
-        </Button>
-      </Menu.Button>
-      <Transition
-        enter="transition duration-100 ease-out"
-        enterFrom="transform scale-95 opacity-0"
-        enterTo="transform scale-100 opacity-100"
-        leave="transition duration-75 ease-out"
-        leaveFrom="transform scale-100 opacity-100"
-        leaveTo="transform scale-95 opacity-0"
-      >
-        <Menu.Items
-          className={menuListClassName(
-            'top-0 left-full absolute w-64 bg-[#f2f4f7] ring-1 ring-black ring-opacity-5 focus:outline-none',
-          )}
-        >
-          {navItem.children.map(x => (
-            <Menu.Item key={x.to}>
-              <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
-                <NavSubItemButtonOrLinkChildren {...x} />
-              </ButtonLink>
-            </Menu.Item>
-          ))}
-        </Menu.Items>
-      </Transition>
+      {({open}) => (
+        <>
+          <Menu.Button as={React.Fragment}>
+            <Button {...navSubItemButtonOrLinkProps}>
+              <NavSubItemButtonOrLinkChildren {...navItem} />
+            </Button>
+          </Menu.Button>
+          <MotionMenuItems
+            initial={open ? 'hidden' : 'show'}
+            variants={{
+              hidden: {transform: 'transitionX(0)'},
+              show: {transform: 'transitionX(-100%)'},
+            }}
+            animate={open ? 'show' : 'hidden'}
+            className={
+              'left-0 fixed inset-y-0 w-[20rem] bg-[#f2f4f7] ring-1 ring-black ring-opacity-5 focus:outline-none z-[-1] transform scale-100'
+            }
+          >
+            {navItem.children.map(x => (
+              <Menu.Item key={x.to}>
+                <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
+                  <NavSubItemButtonOrLinkChildren {...x} />
+                </ButtonLink>
+              </Menu.Item>
+            ))}
+          </MotionMenuItems>
+        </>
+      )}
     </Menu>
   )
 }
@@ -187,7 +186,12 @@ function NavButtonAndSubItemsDrawer({
                 }}
               />
             </Transition.Child>
-            <div className="fixed inset-y-0 right-0 max-w-full flex">
+            <div
+              className="fixed inset-y-0 right-0 max-w-full flex"
+              style={{
+                marginTop: `var(${navbarHeightCssVarName})`,
+              }}
+            >
               <Transition.Child
                 as={React.Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -197,7 +201,7 @@ function NavButtonAndSubItemsDrawer({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <div className="relative w-screen max-w-md">
+                <div className="relative w-[30rem] transform scale-100">
                   <Transition.Child
                     as={React.Fragment}
                     enter="ease-in-out duration-500"
@@ -218,10 +222,10 @@ function NavButtonAndSubItemsDrawer({
                       </button>
                     </div>
                   </Transition.Child>
-                  <div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll overflow-x-auto">
+                  <div className="h-full flex flex-col py-6 bg-white shadow-xl">
                     <div className="relative flex-1">
                       <nav>
-                        <ul className={menuListClassName()}>
+                        <ul className={'py-8 sm:py-6'}>
                           {subItems.map(x => (
                             <li
                               className="flex flex-col flex-nowrap"
@@ -253,6 +257,18 @@ function NavButtonAndSubItemsDrawer({
   )
 }
 
+const navbarHeightCssVarName = '--navbarHeight'
+
+function setNavbarHeightCssVar(el: HTMLElement | null) {
+  if (!el) {
+    return
+  }
+
+  const height = el.clientHeight
+
+  setCssVar(navbarHeightCssVarName, `${height}px`)
+}
+
 export default function Navbar() {
   let {t} = useTranslation('common')
   const LINKS: NavItem[] = [
@@ -280,8 +296,24 @@ export default function Navbar() {
     },
   ]
 
+  const navbarRef = React.useRef<HTMLDivElement>(null)
+
+  const _setNavbarHeightCssVar = React.useCallback(() => {
+    setNavbarHeightCssVar(navbarRef.current)
+  }, [])
+
+  React.useEffect(() => {
+    window.addEventListener('resize', _setNavbarHeightCssVar)
+
+    _setNavbarHeightCssVar()
+
+    return () => {
+      window.removeEventListener('resize', _setNavbarHeightCssVar)
+    }
+  }, [])
+
   return (
-    <div className="px-5vw py-9 lg:py-12">
+    <div className="px-5vw py-9 lg:py-12 sticky z-1" ref={navbarRef}>
       <nav className="flex items-center justify-between mx-auto text-primary max-w-8xl">
         <div>
           <Link

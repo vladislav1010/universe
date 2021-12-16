@@ -8,4 +8,12 @@ function cssVar(name: string) {
     : '#000000'
 }
 
-export {cssVar}
+function setCssVar(name: string, value: string) {
+  if (!globalThis.document.documentElement) {
+    return
+  }
+
+  globalThis.document.documentElement.style.setProperty(name, value)
+}
+
+export {cssVar, setCssVar}
