@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "backMenu": "Go back to previous menu options",
     "drawer": {
       "close": "Close"
     },

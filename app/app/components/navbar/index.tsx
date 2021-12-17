@@ -10,7 +10,7 @@ import {cssVar, setCssVar} from '../../util/css'
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion'
 import {HNavButton, HNavLink} from './h-nav-button'
 import {NavItem, NavItemLink, NavItemWithSubs} from './types'
-import {VNavButton, VNavLink} from './v-nav-button'
+import {BackMenuButton, VNavButton, VNavLink} from './v-button'
 
 const navbarHeightCssVarName = '--navbarHeight'
 
@@ -26,6 +26,8 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
 
 const desktopMenuClassName = 'py-6'
 
+const panelLevel2ClassName = 'bg-[#f2f4f7]'
+
 function NavSubItemButtonAndPopover({
   item,
 }: {
@@ -40,11 +42,12 @@ function NavSubItemButtonAndPopover({
           </Popover.Button>
           <Popover.Panel
             className={clsx(
-              'left-0 fixed inset-y-0 w-[20rem] bg-[#f2f4f7] focus:outline-none z-[-1] transform scale-100',
+              'left-0 fixed inset-y-0 w-[20rem] focus:outline-none z-[-1] transform scale-100',
               {
                 '-translate-x-full': open,
               },
               desktopMenuClassName,
+              panelLevel2ClassName,
             )}
           >
             <ul>
@@ -207,12 +210,18 @@ function MobileNavButtonAndPopover({
 }) {
   return (
     <Popover>
-      {({open}) => (
+      {({open, close}) => (
         <>
           <Popover.Button as={React.Fragment}>
             <VNavButton toPrefix={toPrefix} name={name} />
           </Popover.Button>
-          <MobileSubMenuList items={children} open={open} level={level} />
+          <MobileSubMenuList
+            items={children}
+            open={open}
+            level={level}
+            parentName={name}
+            close={close}
+          />
         </>
       )}
     </Popover>
@@ -223,10 +232,14 @@ function MobileSubMenuList({
   items,
   open,
   level,
+  parentName,
+  close,
 }: {
   items: NavItem[]
   open: boolean
   level: number
+  close: () => void
+  parentName: string
 }) {
   const shouldReduceMotion = useReducedMotion()
   return (
@@ -241,12 +254,16 @@ function MobileSubMenuList({
               duration: shouldReduceMotion ? 0 : 0.15,
               ease: 'linear',
             }}
-            className="fixed inset-0 flex flex-col overflow-y-scroll bg-primary"
+            className={clsx('fixed inset-0 flex flex-col overflow-y-scroll', {
+              'bg-primary': level < 2,
+              [panelLevel2ClassName]: level >= 2,
+            })}
             style={{
               marginTop: `var(${navbarHeightCssVarName})`,
             }}
           >
-            <ul>
+            <BackMenuButton name={parentName} close={close} />
+            <ul className="mt-4">
               {items.map(x => (
                 <li
                   className="flex flex-col flex-nowrap"
@@ -390,7 +407,7 @@ function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
                   key={x.to ?? x.toPrefix}
                 >
                   {x.to == null ? (
-                    <MobileNavButtonAndPopover {...x} />
+                    <MobileNavButtonAndPopover {...x} level={1} />
                   ) : (
                     // Divergent change code smell. Extract function refactoring motivation.
                     <VNavLink {...x} />
