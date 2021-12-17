@@ -8,7 +8,6 @@ import {Dialog, Popover, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar, setCssVar} from '../util/css'
-import { callAllHandlers } from '@chakra-ui/utils'
 
 interface NavItemContent {
   name: string
@@ -125,7 +124,6 @@ function NavSubItemButtonAndMenu({
     </Popover>
   )
 }
-// callAllHandlers<React.MouseEventHandler>(onClose, () => close)
 
 const navSubItemButtonOrLinkProps = {
   innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
