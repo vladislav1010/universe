@@ -4,11 +4,11 @@ import clsx from 'clsx'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from './icons/logo'
 import {Button, ButtonLink, LinkButton} from './button'
-import {Dialog, Menu, Portal, Transition} from '@headlessui/react'
+import {Dialog, Popover, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar, setCssVar} from '../util/css'
-import {animate, motion} from 'framer-motion'
+import { callAllHandlers } from '@chakra-ui/utils'
 
 interface NavItemContent {
   name: string
@@ -84,8 +84,6 @@ function NavButton({
   )
 }
 
-const MotionMenuItems = motion(Menu.Items)
-
 function NavSubItemButtonAndMenu({
   navItem,
   onClose,
@@ -94,15 +92,15 @@ function NavSubItemButtonAndMenu({
   onClose: () => void
 }) {
   return (
-    <Menu as="div" className={'relative inline-block text-left'}>
-      {({open}) => (
+    <Popover as="div" className={'relative inline-block text-left'}>
+      {({open, close}) => (
         <>
-          <Menu.Button as={React.Fragment}>
+          <Popover.Button as={React.Fragment}>
             <Button {...navSubItemButtonOrLinkProps}>
               <NavSubItemButtonOrLinkChildren {...navItem} />
             </Button>
-          </Menu.Button>
-          <Menu.Items
+          </Popover.Button>
+          <Popover.Panel
             className={clsx(
               'left-0 fixed inset-y-0 w-[20rem] bg-[#f2f4f7] focus:outline-none z-[-1] transform scale-100',
               {
@@ -110,22 +108,26 @@ function NavSubItemButtonAndMenu({
               },
             )}
           >
+            <ul>
             {navItem.children.map(x => (
-              <Menu.Item key={x.to}>
+              <li key={x.to}>
                 <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
                   <NavSubItemButtonOrLinkChildren {...x} />
                 </ButtonLink>
-              </Menu.Item>
+              </li>
             ))}
+            </ul>
+            
             <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex">
-              <CloseButton onClose={onClose} />
+              <CloseButton onClose={() => close()} />
             </div>
-          </Menu.Items>
+          </Popover.Panel>
         </>
       )}
-    </Menu>
+    </Popover>
   )
 }
+// callAllHandlers<React.MouseEventHandler>(onClose, () => close)
 
 const navSubItemButtonOrLinkProps = {
   innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
@@ -150,7 +152,7 @@ function CloseButton({
   className,
   onClose,
 }: {
-  onClose: () => void
+  onClose: React.MouseEventHandler
   className?: string
 }) {
   const {t} = useTranslation('common')

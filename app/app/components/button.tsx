@@ -67,21 +67,21 @@ function ButtonInner({
   )
 }
 
-function Button({
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps & Omit<JSX.IntrinsicElements['button'], 'children'>>(function Button({
   children,
   className,
   innerClassName,
   isRounded = true,
   ...buttonProps
-}: ButtonProps & Omit<JSX.IntrinsicElements['button'], 'children'>) {
+}, ref) {
   return (
-    <button {...buttonProps} className={getClassName({className})}>
+    <button {...buttonProps} className={getClassName({className})} ref={ref}>
       <ButtonInner className={innerClassName} isRounded={isRounded}>
         {children}
       </ButtonInner>
     </button>
   )
-}
+})
 
 const ButtonLink = React.forwardRef<
   HTMLAnchorElement,
