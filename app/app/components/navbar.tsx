@@ -24,7 +24,7 @@ interface NavItemLink extends NavItemContent {
 
 interface NavItemWithSubItems<Item extends NavItem = NavItem>
   extends NavItemContent {
-  children: NavItem[]
+  children: Item[]
   toPrefix: string
   to?: never
 }
