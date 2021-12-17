@@ -36,14 +36,18 @@ function Link({to, ...content}: NavItemLink) {
   )
 }
 
-function Button({toPrefix, ...content}: Omit<NavItemWithSubs, 'children'>) {
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  Omit<NavItemWithSubs, 'children'> &
+    Omit<JSX.IntrinsicElements['button'], 'children' | 'className'>
+>(function Button({toPrefix, name, description, ...buttonProps}, ref) {
   const isSelected = useIsSelected(toPrefix)
 
   return (
-    <ButtonBase {...props({isSelected})}>
-      <ButtonInner {...content} />
+    <ButtonBase {...props({isSelected})} {...buttonProps} ref={ref}>
+      <ButtonInner name={name} description={description} />
     </ButtonBase>
   )
-}
+})
 
 export {Button as VNavButton, Link as VNavLink}
