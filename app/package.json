@@ -17,7 +17,8 @@
     "test": "jest",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext js,jsx,ts,tsx .",
     "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|less|scss|ts|tsx|md|gql|graphql|mdx|vue)\"",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "prepare": "is-ci || cd .. && husky install front/.husky"
   },
   "dependencies": {
     "@chakra-ui/hooks": "^1.7.1",
@@ -64,6 +65,8 @@
     "cross-env": "^7.0.3",
     "dotenv-cli": "^4.1.1",
     "esbuild-register": "^3.2.0",
+    "husky": "^7.0.0",
+    "is-ci": "^3.0.1",
     "msw": "^0.35.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
