@@ -48,6 +48,8 @@ export default function App() {
   )
 }
 
+// TODO: customize below
+
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
 export function ErrorBoundary({error}: {error: Error}) {
   console.error(error)
@@ -57,11 +59,6 @@ export function ErrorBoundary({error}: {error: Error}) {
         <div>
           <h1>There was an error</h1>
           <p>{error.message}</p>
-          <hr />
-          <p>
-            Hey, developer, you should replace this with what you want your
-            users to see.
-          </p>
         </div>
       </Layout>
     </Document>
@@ -129,7 +126,7 @@ function Document({
           <link rel="stylesheet" href={noScriptStyles} />
         </noscript>
       </head>
-      <body>
+      <body className="dark:bg-gray-900 bg-white transition duration-500">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -139,15 +136,13 @@ function Document({
   )
 }
 
-// IMPORTANT: all code relies on portals should be in the same stacking context as app inner stuff
+// IMPORTANT: all code relies on portals, that should be in the same stacking context as app inner stuff
 function Layout({children}: {children: React.ReactNode}) {
   return (
-    <div>
-      <header>
-        <Navbar />
-      </header>
-      <main>{children}</main>
-    </div>
+    <>
+      <Navbar />
+      {children}
+    </>
   )
 }
 
