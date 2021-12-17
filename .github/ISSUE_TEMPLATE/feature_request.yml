@@ -22,4 +22,4 @@ body:
     attributes:
       label: Any Other info.
     validations:
-      required: true
+      required: false
