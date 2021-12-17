@@ -26,17 +26,17 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
 
 const desktopMenuClassName = 'py-6'
 
-function NavSubItemButtonAndMenu({
-  navItem,
+function NavSubItemButtonAndPopover({
+  item,
 }: {
-  navItem: NavItemWithSubs<NavItemLink>
+  item: NavItemWithSubs<NavItemLink>
 }) {
   return (
     <Popover as="div" className="relative inline-block text-left">
       {({open, close}) => (
         <>
           <Popover.Button as={React.Fragment}>
-            <VNavButton {...navItem} />
+            <VNavButton {...item} />
           </Popover.Button>
           <Popover.Panel
             className={clsx(
@@ -48,7 +48,7 @@ function NavSubItemButtonAndMenu({
             )}
           >
             <ul>
-              {navItem.children.map(x => (
+              {item.children.map(x => (
                 <li key={x.to}>
                   <VNavLink {...x} />
                 </li>
@@ -93,10 +93,10 @@ function CloseButton({
   )
 }
 
-function NavButtonAndMenu({
+function NavButtonAndDrawer({
   toPrefix,
   name,
-  children: subItems,
+  children,
 }: Pick<NavItemWithSubs, 'toPrefix' | 'name' | 'children'>) {
   const {isOpen, onClose, onToggle} = useDisclosure()
 
@@ -169,14 +169,14 @@ function NavButtonAndMenu({
                   >
                     <div className="relative flex-1">
                       <ul>
-                        {subItems.map(x => (
+                        {children.map(x => (
                           <li
                             className="flex flex-col flex-nowrap"
                             key={x.to ?? x.toPrefix}
                           >
                             {x.to == null ? (
-                              <NavSubItemButtonAndMenu
-                                navItem={x as NavItemWithSubs<NavItemLink>}
+                              <NavSubItemButtonAndPopover
+                                item={x as NavItemWithSubs<NavItemLink>}
                               />
                             ) : (
                               <VNavLink {...x} />
@@ -211,7 +211,7 @@ const bottomVariants = {
   closed: {rotate: 0, y: 0},
 }
 
-function MobileMenu({items}: {items: NavItem[]}) {
+function MobilePopover({items}: {items: NavItem[]}) {
   const shouldReduceMotion = useReducedMotion()
   const transition = shouldReduceMotion ? {duration: 0} : {}
 
@@ -393,15 +393,15 @@ export default function Navbar() {
           </Link>
         </div>
         <div className="block lg:hidden">
-          <MobileMenu items={ITEMS} />
+          <MobilePopover items={ITEMS} />
         </div>
         <ul className="hidden lg:flex">
           {ITEMS.map(x => (
             <li className="px-5 py-2" key={x.to ?? x.toPrefix}>
               {x.to == null ? (
-                <NavButtonAndMenu toPrefix={x.toPrefix} name={x.name}>
+                <NavButtonAndDrawer toPrefix={x.toPrefix} name={x.name}>
                   {x.children}
-                </NavButtonAndMenu>
+                </NavButtonAndDrawer>
               ) : (
                 <HNavLink to={x.to}>{x.name}</HNavLink>
               )}
