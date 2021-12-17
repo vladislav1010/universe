@@ -86,10 +86,8 @@ function NavButton({
 
 function NavSubItemButtonAndMenu({
   navItem,
-  onClose,
 }: {
   navItem: NavItemWithSubItems<NavItemLink>
-  onClose: () => void
 }) {
   return (
     <Popover as="div" className={'relative inline-block text-left'}>
@@ -270,8 +268,7 @@ function NavButtonAndSubItemsDrawer({
                                 </ButtonLink>
                               ) : (
                                 <NavSubItemButtonAndMenu
-                                  navItem={x}
-                                  onClose={onClose}
+                                  navItem={x as NavItemWithSubItems<NavItemLink>}
                                 />
                               )}
                             </li>
