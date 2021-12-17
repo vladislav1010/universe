@@ -4,7 +4,7 @@ import {Button as ButtonBase, ButtonLink as ButtonLinkBase} from '../button'
 import clsx from 'clsx'
 import {useIsSelected} from './is-selected'
 
-const props = ({isSelected}: {isSelected?: boolean}) => ({
+const props = ({isSelected}: {isSelected: boolean}) => ({
   innerClassName: clsx('py-3 px-12 md:px-8 sm:px-6', {
     'text-team-current active': isSelected,
     'text-secondary': !isSelected,
