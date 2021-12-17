@@ -1,110 +1,40 @@
 import * as React from 'react'
-import {Link, useLocation} from 'remix'
+import {Link} from 'remix'
 import clsx from 'clsx'
 import {useTranslation} from 'react-i18next'
-import {LogoIcon} from './icons/logo'
-import {Button, ButtonLink, LinkButton} from './button'
+import {LogoIcon} from '../icons/logo'
 import {Dialog, Popover, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
-import {cssVar, setCssVar} from '../util/css'
+import {cssVar, setCssVar} from '../../util/css'
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion'
-
-interface NavItemContent {
-  name: string
-  description?: string
-}
-
-interface NavItemLink extends NavItemContent {
-  to: string
-  children?: never
-  toPrefix?: never
-  description?: string
-}
-
-interface NavItemWithSubItems<Item extends NavItem = NavItem>
-  extends NavItemContent {
-  children: Item[]
-  toPrefix: string
-  to?: never
-}
-
-type NavItem = NavItemLink | NavItemWithSubItems
-
-const navItemVerticalButtonOrLinkProps = {
-  innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
-  className: 'w-full',
-  isRounded: false,
-}
+import {HNavButton, HNavLink} from './h-nav-button'
+import {NavItem, NavItemLink, NavItemWithSubs} from './types'
+import {VNavButton, VNavLink} from './v-nav-button'
 
 const navbarHeightCssVarName = '--navbarHeight'
 
-function navLinkOrButtonClassName({
-  className,
-  isSelected,
-}: {
-  className?: string
-  isSelected: boolean
-}) {
-  return clsx(
-    'underlined block hover:text-team-current focus:text-team-current whitespace-nowrap text-lg font-medium focus:outline-none',
-    {
-      'text-team-current active': isSelected,
-      'text-secondary': !isSelected,
-    },
-    className,
-  )
-}
+function setNavbarHeightCssVar(el: HTMLElement | null) {
+  if (!el) {
+    return
+  }
 
-function NavLink({
-  to,
-  ...rest
-}: Omit<Parameters<typeof Link>['0'], 'to'> & {to: string}) {
-  const location = useLocation()
-  const isSelected =
-    to === location.pathname || location.pathname.startsWith(`${to}/`)
+  const height = el.clientHeight
 
-  return (
-    <Link
-      prefetch="intent"
-      className={navLinkOrButtonClassName({isSelected})}
-      to={to}
-      {...rest}
-    />
-  )
-}
-
-function NavButton({
-  toPrefix,
-  ...buttonProps
-}: Pick<NavItemWithSubItems, 'toPrefix'> &
-  Omit<JSX.IntrinsicElements['button'], 'className'>) {
-  const location = useLocation()
-  const isSelected =
-    toPrefix === location.pathname ||
-    location.pathname.startsWith(`${toPrefix}/`)
-
-  return (
-    <LinkButton
-      className={navLinkOrButtonClassName({isSelected})}
-      {...buttonProps}
-    />
-  )
+  setCssVar(navbarHeightCssVarName, `${height}px`)
 }
 
 function NavSubItemButtonAndMenu({
   navItem,
 }: {
-  navItem: NavItemWithSubItems<NavItemLink>
+  navItem: NavItemWithSubs<NavItemLink>
 }) {
   return (
     <Popover as="div" className="relative inline-block text-left">
       {({open, close}) => (
         <>
           <Popover.Button as={React.Fragment}>
-            <Button {...navItemVerticalButtonOrLinkProps}>
-              <NavSubItemButtonOrLinkContent {...navItem} />
-            </Button>
+            <VNavButton {...navItem} />
           </Popover.Button>
           <Popover.Panel
             className={clsx(
@@ -117,9 +47,7 @@ function NavSubItemButtonAndMenu({
             <ul>
               {navItem.children.map(x => (
                 <li key={x.to}>
-                  <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
-                    <NavSubItemButtonOrLinkContent {...x} />
-                  </ButtonLink>
+                  <VNavLink {...x} />
                 </li>
               ))}
             </ul>
@@ -132,19 +60,6 @@ function NavSubItemButtonAndMenu({
       )}
     </Popover>
   )
-}
-
-function NavSubItemButtonOrLinkContent({name, description}: NavItemContent) {
-  if (description == null) {
-    return <span>{name}</span>
-  } else {
-    return (
-      <div className="flex flex-col flex-nowrap">
-        <div>{name}</div>
-        <div className="text-gray-400 text-sm">{description}</div>
-      </div>
-    )
-  }
 }
 
 function CloseButton({
@@ -179,14 +94,14 @@ function NavButtonAndMenu({
   toPrefix,
   name,
   children: subItems,
-}: Pick<NavItemWithSubItems, 'toPrefix' | 'name' | 'children'>) {
+}: Pick<NavItemWithSubs, 'toPrefix' | 'name' | 'children'>) {
   const {isOpen, onClose, onToggle} = useDisclosure()
 
   return (
     <>
-      <NavButton onClick={onToggle} toPrefix={toPrefix}>
+      <HNavButton onClick={onToggle} toPrefix={toPrefix}>
         {name}
-      </NavButton>
+      </HNavButton>
       <Transition.Root show={isOpen} as={React.Fragment}>
         <Dialog
           as="div"
@@ -253,15 +168,10 @@ function NavButtonAndMenu({
                           >
                             {x.to == null ? (
                               <NavSubItemButtonAndMenu
-                                navItem={x as NavItemWithSubItems<NavItemLink>}
+                                navItem={x as NavItemWithSubs<NavItemLink>}
                               />
                             ) : (
-                              <ButtonLink
-                                {...navItemVerticalButtonOrLinkProps}
-                                to={x.to}
-                              >
-                                <NavSubItemButtonOrLinkContent {...x} />
-                              </ButtonLink>
+                              <VNavLink {...x} />
                             )}
                           </li>
                         ))}
@@ -276,16 +186,6 @@ function NavButtonAndMenu({
       </Transition.Root>
     </>
   )
-}
-
-function setNavbarHeightCssVar(el: HTMLElement | null) {
-  if (!el) {
-    return
-  }
-
-  const height = el.clientHeight
-
-  setCssVar(navbarHeightCssVarName, `${height}px`)
 }
 
 const topVariants = {
@@ -414,9 +314,7 @@ function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
                     <div />
                   ) : (
                     // Divergent change code smell. Extract function refactoring motivation.
-                    <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
-                      <NavSubItemButtonOrLinkContent {...x} />
-                    </ButtonLink>
+                    <VNavLink {...x} />
                   )}
                 </li>
               ))}
@@ -497,7 +395,7 @@ export default function Navbar() {
                   {x.children}
                 </NavButtonAndMenu>
               ) : (
-                <NavLink to={x.to}>{x.name}</NavLink>
+                <HNavLink to={x.to}>{x.name}</HNavLink>
               )}
             </li>
           ))}
