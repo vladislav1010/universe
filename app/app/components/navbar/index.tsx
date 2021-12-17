@@ -196,6 +196,78 @@ function NavButtonAndDrawer({
   )
 }
 
+// TODO: indicate somehow that root nav items haven't description
+function MobileNavButtonAndPopover({
+  toPrefix,
+  name,
+  children,
+  level,
+}: Pick<NavItemWithSubs, 'toPrefix' | 'name' | 'children'> & {
+  level: number
+}) {
+  return (
+    <Popover>
+      {({open}) => (
+        <>
+          <Popover.Button as={React.Fragment}>
+            <VNavButton toPrefix={toPrefix} name={name} />
+          </Popover.Button>
+          <MobileSubMenuList items={children} open={open} level={level} />
+        </>
+      )}
+    </Popover>
+  )
+}
+
+function MobileSubMenuList({
+  items,
+  open,
+  level,
+}: {
+  items: NavItem[]
+  open: boolean
+  level: number
+}) {
+  const shouldReduceMotion = useReducedMotion()
+  return (
+    <AnimatePresence>
+      {open ? (
+        <Popover.Panel as={React.Fragment} static>
+          <motion.div
+            initial={{opacity: 0, x: -200}}
+            animate={{opacity: 1, x: 0}}
+            exit={{opacity: 0, x: -200}}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.15,
+              ease: 'linear',
+            }}
+            className="fixed inset-0 flex flex-col overflow-y-scroll bg-primary"
+            style={{
+              marginTop: `var(${navbarHeightCssVarName})`,
+            }}
+          >
+            <ul>
+              {items.map(x => (
+                <li
+                  className="flex flex-col flex-nowrap"
+                  key={x.to ?? x.toPrefix}
+                >
+                  {x.to == null ? (
+                    <MobileNavButtonAndPopover {...x} level={level + 1} />
+                  ) : (
+                    // Divergent change code smell. Extract function refactoring motivation.
+                    <VNavLink {...x} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </Popover.Panel>
+      ) : null}
+    </AnimatePresence>
+  )
+}
+
 const topVariants = {
   open: {rotate: 45, y: 7},
   closed: {rotate: 0, y: 0},
@@ -318,8 +390,7 @@ function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
                   key={x.to ?? x.toPrefix}
                 >
                   {x.to == null ? (
-                    // TODO:
-                    <div />
+                    <MobileNavButtonAndPopover {...x} />
                   ) : (
                     // Divergent change code smell. Extract function refactoring motivation.
                     <VNavLink {...x} />
