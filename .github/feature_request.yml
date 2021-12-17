@@ -1,0 +1,25 @@
+name: 💡 Feature Request
+description: I want to add something to universe.
+title: "[Feature]: "
+labels:
+  - feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for contributing!
+  - type: textarea
+    attributes:
+      label: Describe the feature and the current behavior/state.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Will this change the current api? How?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Any Other info.
+    validations:
+      required: true
