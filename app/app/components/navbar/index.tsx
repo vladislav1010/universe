@@ -3,7 +3,7 @@ import {Link} from 'remix'
 import clsx from 'clsx'
 import {useTranslation} from 'react-i18next'
 import {LogoIcon} from '../icons/logo'
-import {Dialog, Popover, Transition} from '@headlessui/react'
+import {Dialog, Popover} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar, setCssVar} from '../../util/css'
@@ -28,11 +28,15 @@ const desktopMenuClassName = 'py-6'
 
 const panelLevel2ClassName = 'bg-[#f2f4f7]'
 
+const transformForChangingContainingBlockClassName = 'transform scale-100'
+
 function NavSubItemButtonAndPopover({
   item,
 }: {
   item: NavItemWithSubs<NavItemLink>
 }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <Popover as="div" className="relative inline-block text-left">
       {({open, close}) => (
@@ -40,28 +44,41 @@ function NavSubItemButtonAndPopover({
           <Popover.Button as={React.Fragment}>
             <VNavButton {...item} />
           </Popover.Button>
-          <Popover.Panel
-            className={clsx(
-              'left-0 fixed inset-y-0 w-[20rem] focus:outline-none z-[-1] transform scale-100',
-              {
-                '-translate-x-full': open,
-              },
-              desktopMenuClassName,
-              panelLevel2ClassName,
-            )}
-          >
-            <ul>
-              {item.children.map(x => (
-                <li key={x.to}>
-                  <VNavLink {...x} />
-                </li>
-              ))}
-            </ul>
+          <AnimatePresence>
+            {open ? (
+              <Popover.Panel static as={React.Fragment}>
+                <motion.div
+                  initial={{opacity: 0}}
+                  className={clsx(
+                    'left-0 fixed inset-y-0 w-[85%] focus:outline-none z-[-1]',
+                    {
+                      '-translate-x-full': open,
+                    },
+                    desktopMenuClassName,
+                    panelLevel2ClassName,
+                  )}
+                  transition={{
+                    duration: shouldReduceMotion ? 0 : 0.15,
+                    ease: 'easeInOut',
+                  }}
+                  animate={{opacity: 1}}
+                  exit={{opacity: 0}}
+                >
+                  <ul>
+                    {item.children.map(x => (
+                      <li key={x.to}>
+                        <VNavLink {...x} />
+                      </li>
+                    ))}
+                  </ul>
 
-            <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex">
-              <CloseButton onClose={() => close()} />
-            </div>
-          </Popover.Panel>
+                  <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex">
+                    <CloseButton onClose={() => close()} />
+                  </div>
+                </motion.div>
+              </Popover.Panel>
+            ) : null}
+          </AnimatePresence>
         </>
       )}
     </Popover>
@@ -96,37 +113,39 @@ function CloseButton({
   )
 }
 
+const MotionDialogOverlay = motion(Dialog.Overlay)
+
 function NavButtonAndDrawer({
   toPrefix,
   name,
   children,
 }: Pick<NavItemWithSubs, 'toPrefix' | 'name' | 'children'>) {
   const {isOpen, onClose, onToggle} = useDisclosure()
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <>
       <HNavButton onClick={onToggle} toPrefix={toPrefix}>
         {name}
       </HNavButton>
-      <Transition.Root show={isOpen} as={React.Fragment}>
-        <Dialog
-          as="div"
-          static
-          className="fixed inset-0 overflow-hidden"
-          open={isOpen}
-          onClose={onClose}
-        >
-          <div className="absolute inset-0 overflow-hidden">
-            <Transition.Child
-              as={React.Fragment}
-              enter="ease-in-out duration-500"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in-out duration-500"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Dialog.Overlay
+      <Dialog
+        as="div"
+        static
+        className="fixed inset-0 overflow-hidden"
+        open={isOpen}
+        onClose={onClose}
+      >
+        <AnimatePresence>
+          {isOpen ? (
+            <div className="absolute inset-0 overflow-hidden">
+              <MotionDialogOverlay
+                initial={{opacity: 0}}
+                transition={{
+                  duration: shouldReduceMotion ? 0 : 0.15,
+                  ease: 'easeInOut',
+                }}
+                animate={{opacity: 1}}
+                exit={{opacity: 0}}
                 className="absolute inset-0 transition-opacity backdrop-blur-md"
                 style={{
                   backgroundColor: `#${new TinyColor(cssVar('--text-primary'))
@@ -134,36 +153,28 @@ function NavButtonAndDrawer({
                     .toHex8()}`,
                 }}
               />
-            </Transition.Child>
-            <div
-              className="fixed inset-y-0 right-0 max-w-full flex"
-              style={{
-                marginTop: `var(${navbarHeightCssVarName})`,
-              }}
-            >
-              <Transition.Child
-                as={React.Fragment}
-                enter="transform transition ease-in-out duration-500"
-                enterFrom="translate-x-full"
-                enterTo="translate-x-0"
-                leave="transform transition ease-in-out duration-500"
-                leaveFrom="translate-x-0"
-                leaveTo="translate-x-full"
+              <div
+                className="fixed inset-y-0 right-0 w-[40%] flex"
+                style={{
+                  marginTop: `var(${navbarHeightCssVarName})`,
+                }}
               >
-                <div className="relative w-[30rem] transform scale-100">
-                  <Transition.Child
-                    as={React.Fragment}
-                    enter="ease-in-out duration-500"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in-out duration-500"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex z-[-11]">
-                      <CloseButton onClose={onClose} />
-                    </div>
-                  </Transition.Child>
+                <motion.div
+                  initial={{opacity: 0}}
+                  transition={{
+                    duration: shouldReduceMotion ? 0 : 0.15,
+                    ease: 'easeInOut',
+                  }}
+                  animate={{opacity: 1}}
+                  exit={{opacity: 0}}
+                  className={clsx(
+                    'w-full',
+                    transformForChangingContainingBlockClassName,
+                  )}
+                >
+                  <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex z-[-11]">
+                    <CloseButton onClose={onClose} />
+                  </div>
                   <div
                     className={clsx(
                       'h-full flex flex-col bg-primary shadow-xl',
@@ -189,12 +200,12 @@ function NavButtonAndDrawer({
                       </ul>
                     </div>
                   </div>
-                </div>
-              </Transition.Child>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </Dialog>
-      </Transition.Root>
+          ) : null}
+        </AnimatePresence>
+      </Dialog>
     </>
   )
 }
