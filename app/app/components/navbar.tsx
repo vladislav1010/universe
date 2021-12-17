@@ -8,6 +8,8 @@ import {Dialog, Popover, Transition} from '@headlessui/react'
 import {useDisclosure} from '@chakra-ui/hooks'
 import {TinyColor} from '@ctrl/tinycolor'
 import {cssVar, setCssVar} from '../util/css'
+import {AnimatePresence, motion, useReducedMotion} from 'framer-motion'
+import {CloseIcon} from '@chakra-ui/icons'
 
 interface NavItemContent {
   name: string
@@ -30,7 +32,7 @@ interface NavItemWithSubItems<Item extends NavItem = NavItem>
 
 type NavItem = NavItemLink | NavItemWithSubItems
 
-const navSubItemButtonOrLinkProps = {
+const navItemVerticalButtonOrLinkProps = {
   innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
   className: 'w-full',
   isRounded: false,
@@ -101,7 +103,7 @@ function NavSubItemButtonAndMenu({
       {({open, close}) => (
         <>
           <Popover.Button as={React.Fragment}>
-            <Button {...navSubItemButtonOrLinkProps}>
+            <Button {...navItemVerticalButtonOrLinkProps}>
               <NavSubItemButtonOrLinkContent {...navItem} />
             </Button>
           </Popover.Button>
@@ -116,7 +118,7 @@ function NavSubItemButtonAndMenu({
             <ul>
               {navItem.children.map(x => (
                 <li key={x.to}>
-                  <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
+                  <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
                     <NavSubItemButtonOrLinkContent {...x} />
                   </ButtonLink>
                 </li>
@@ -135,7 +137,7 @@ function NavSubItemButtonAndMenu({
 
 function NavSubItemButtonOrLinkContent({name, description}: NavItemContent) {
   if (description == null) {
-    return <span>name</span>
+    return <span>{name}</span>
   } else {
     return (
       <div className="flex flex-col flex-nowrap">
@@ -163,24 +165,13 @@ function CloseButton({
       )}
       onClick={onClose}
     >
-      <svg
-        aria-hidden="true"
-        focusable="false"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 352 512"
-      >
-        <path
-          fill="currentColor"
-          d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-        />
-      </svg>
+      <CloseIcon />
       <span className="sr-only">{t('navbar.drawer.close')}</span>
     </button>
   )
 }
 
-function NavButtonAndSubItemsDrawer({
+function NavButtonAndMenu({
   toPrefix,
   name,
   children: subItems,
@@ -213,7 +204,7 @@ function NavButtonAndSubItemsDrawer({
               <Dialog.Overlay
                 className="absolute inset-0 transition-opacity backdrop-blur-md"
                 style={{
-                  backgroundColor: `#${new TinyColor(cssVar('--color-black'))
+                  backgroundColor: `#${new TinyColor(cssVar('--text-primary'))
                     .setAlpha(0.02)
                     .toHex8()}`,
                 }}
@@ -227,10 +218,10 @@ function NavButtonAndSubItemsDrawer({
             >
               <Transition.Child
                 as={React.Fragment}
-                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                enter="transform transition ease-in-out duration-500"
                 enterFrom="translate-x-full"
                 enterTo="translate-x-0"
-                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                leave="transform transition ease-in-out duration-500"
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
@@ -248,33 +239,29 @@ function NavButtonAndSubItemsDrawer({
                       <CloseButton onClose={onClose} />
                     </div>
                   </Transition.Child>
-                  <div className="h-full flex flex-col py-6 bg-white shadow-xl">
+                  <div className="h-full flex flex-col py-6 bg-primary shadow-xl">
                     <div className="relative flex-1">
-                      <nav>
-                        <ul className="py-8 sm:py-6">
-                          {subItems.map(x => (
-                            <li
-                              className="flex flex-col flex-nowrap"
-                              key={x.to ?? x.toPrefix}
-                            >
-                              {x.to == null ? (
-                                <NavSubItemButtonAndMenu
-                                  navItem={
-                                    x as NavItemWithSubItems<NavItemLink>
-                                  }
-                                />
-                              ) : (
-                                <ButtonLink
-                                  {...navSubItemButtonOrLinkProps}
-                                  to={x.to}
-                                >
-                                  <NavSubItemButtonOrLinkContent {...x} />
-                                </ButtonLink>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </nav>
+                      <ul className="py-8">
+                        {subItems.map(x => (
+                          <li
+                            className="flex flex-col flex-nowrap"
+                            key={x.to ?? x.toPrefix}
+                          >
+                            {x.to == null ? (
+                              <NavSubItemButtonAndMenu
+                                navItem={x as NavItemWithSubItems<NavItemLink>}
+                              />
+                            ) : (
+                              <ButtonLink
+                                {...navItemVerticalButtonOrLinkProps}
+                                to={x.to}
+                              >
+                                <NavSubItemButtonOrLinkContent {...x} />
+                              </ButtonLink>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -297,9 +284,147 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
   setCssVar(navbarHeightCssVarName, `${height}px`)
 }
 
+const topVariants = {
+  open: {rotate: 45, y: 7},
+  closed: {rotate: 0, y: 0},
+}
+
+const centerVariants = {
+  open: {opacity: 0},
+  closed: {opacity: 1},
+}
+
+const bottomVariants = {
+  open: {rotate: -45, y: -5},
+  closed: {rotate: 0, y: 0},
+}
+
+function MobileMenu({items}: {items: NavItem[]}) {
+  const shouldReduceMotion = useReducedMotion()
+  const transition = shouldReduceMotion ? {duration: 0} : {}
+
+  return (
+    <Popover>
+      {({open}) => {
+        const state = open ? 'open' : 'closed'
+
+        return (
+          <>
+            <Popover.Button as={React.Fragment}>
+              <button className="inline-flex items-center justify-center p-1 transition border-2 rounded-full focus:border-primary hover:border-primary border-secondary text-primary w-14 h-14 focus:outline-none">
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <motion.rect
+                    animate={state}
+                    variants={topVariants}
+                    transition={transition}
+                    x="6"
+                    y="9"
+                    width="20"
+                    height="2"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                  <motion.rect
+                    animate={state}
+                    variants={centerVariants}
+                    transition={transition}
+                    x="6"
+                    y="15"
+                    width="20"
+                    height="2"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                  <motion.rect
+                    animate={state}
+                    variants={bottomVariants}
+                    transition={transition}
+                    x="6"
+                    y="21"
+                    width="20"
+                    height="2"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </Popover.Button>
+            <MobileMenuList items={items} open={open} />
+          </>
+        )
+      }}
+    </Popover>
+  )
+}
+
+function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
+  const shouldReduceMotion = useReducedMotion()
+
+  React.useEffect(() => {
+    if (open) {
+      // don't use overflow-hidden, as that toggles the scrollbar and causes layout shift
+      document.body.classList.add('fixed')
+      document.body.classList.add('overflow-y-scroll')
+      // alternatively, get bounding box of the menu, and set body height to that.
+      document.body.style.height = '100vh'
+      document.body.style.width = '100vw'
+    } else {
+      document.body.classList.remove('fixed')
+      document.body.classList.remove('overflow-y-scroll')
+      document.body.style.removeProperty('height')
+      document.body.style.removeProperty('width')
+    }
+  }, [open])
+
+  return (
+    <AnimatePresence>
+      <Popover.Panel as={React.Fragment}>
+        <motion.div
+          initial={{opacity: 0}}
+          animate={{opacity: 1}}
+          exit={{opacity: 0}}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.15,
+            ease: 'linear',
+          }}
+          className="fixed inset-0 flex flex-col overflow-y-scroll bg-primary"
+          style={{
+            marginTop: `var(${navbarHeightCssVarName})`,
+          }}
+        >
+          <ul>
+            {items.map(x => (
+              <li
+                className="flex flex-col flex-nowrap"
+                key={x.to ?? x.toPrefix}
+              >
+                {x.to == null ? (
+                  // TODO:
+                  <div />
+                ) : (
+                  // Divergent change code smell. Extract function refactoring motivation.
+                  <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
+                    <NavSubItemButtonOrLinkContent {...x} />
+                  </ButtonLink>
+                )}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </Popover.Panel>
+    </AnimatePresence>
+  )
+}
+
 export default function Navbar() {
   const {t} = useTranslation('common')
-  const LINKS: NavItem[] = [
+  const ITEMS: NavItem[] = [
     {name: t('navbar.links.services.name'), to: '/services'},
     {
       name: t('navbar.links.test.name'),
@@ -341,7 +466,10 @@ export default function Navbar() {
   }, [_setNavbarHeightCssVar])
 
   return (
-    <div className="px-5vw py-9 lg:py-12 sticky z-[1] bg-white" ref={navbarRef}>
+    <div
+      className="px-5vw py-9 lg:py-12 sticky z-[1] bg-primary"
+      ref={navbarRef}
+    >
       <nav className="flex items-center justify-between mx-auto text-primary max-w-8xl">
         <div>
           <Link
@@ -352,19 +480,18 @@ export default function Navbar() {
             <LogoIcon />
           </Link>
         </div>
-
+        <div className="block lg:hidden">
+          <MobileMenu items={ITEMS} />
+        </div>
         <ul className="hidden lg:flex">
-          {LINKS.map(link => (
-            <li className="px-5 py-2" key={link.to ?? link.toPrefix}>
-              {link.to == null ? (
-                <NavButtonAndSubItemsDrawer
-                  toPrefix={link.toPrefix}
-                  name={link.name}
-                >
-                  {link.children}
-                </NavButtonAndSubItemsDrawer>
+          {ITEMS.map(x => (
+            <li className="px-5 py-2" key={x.to ?? x.toPrefix}>
+              {x.to == null ? (
+                <NavButtonAndMenu toPrefix={x.toPrefix} name={x.name}>
+                  {x.children}
+                </NavButtonAndMenu>
               ) : (
-                <NavLink to={link.to}>{link.name}</NavLink>
+                <NavLink to={x.to}>{x.name}</NavLink>
               )}
             </li>
           ))}
