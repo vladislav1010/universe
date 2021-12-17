@@ -388,40 +388,42 @@ function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
 
   return (
     <AnimatePresence>
-      <Popover.Panel as={React.Fragment}>
-        <motion.div
-          initial={{opacity: 0}}
-          animate={{opacity: 1}}
-          exit={{opacity: 0}}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.15,
-            ease: 'linear',
-          }}
-          className="fixed inset-0 flex flex-col overflow-y-scroll bg-primary"
-          style={{
-            marginTop: `var(${navbarHeightCssVarName})`,
-          }}
-        >
-          <ul>
-            {items.map(x => (
-              <li
-                className="flex flex-col flex-nowrap"
-                key={x.to ?? x.toPrefix}
-              >
-                {x.to == null ? (
-                  // TODO:
-                  <div />
-                ) : (
-                  // Divergent change code smell. Extract function refactoring motivation.
-                  <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
-                    <NavSubItemButtonOrLinkContent {...x} />
-                  </ButtonLink>
-                )}
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </Popover.Panel>
+      {open ? (
+        <Popover.Panel as={React.Fragment} static>
+          <motion.div
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.15,
+              ease: 'linear',
+            }}
+            className="fixed inset-0 flex flex-col overflow-y-scroll bg-primary"
+            style={{
+              marginTop: `var(${navbarHeightCssVarName})`,
+            }}
+          >
+            <ul>
+              {items.map(x => (
+                <li
+                  className="flex flex-col flex-nowrap"
+                  key={x.to ?? x.toPrefix}
+                >
+                  {x.to == null ? (
+                    // TODO:
+                    <div />
+                  ) : (
+                    // Divergent change code smell. Extract function refactoring motivation.
+                    <ButtonLink {...navItemVerticalButtonOrLinkProps} to={x.to}>
+                      <NavSubItemButtonOrLinkContent {...x} />
+                    </ButtonLink>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </Popover.Panel>
+      ) : null}
     </AnimatePresence>
   )
 }
