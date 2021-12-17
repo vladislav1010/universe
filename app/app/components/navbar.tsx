@@ -94,7 +94,7 @@ function NavSubItemButtonAndMenu({
         <>
           <Popover.Button as={React.Fragment}>
             <Button {...navSubItemButtonOrLinkProps}>
-              <NavSubItemButtonOrLinkChildren {...navItem} />
+              <NavSubItemButtonOrLinkContent {...navItem} />
             </Button>
           </Popover.Button>
           <Popover.Panel
@@ -109,7 +109,7 @@ function NavSubItemButtonAndMenu({
             {navItem.children.map(x => (
               <li key={x.to}>
                 <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
-                  <NavSubItemButtonOrLinkChildren {...x} />
+                  <NavSubItemButtonOrLinkContent {...x} />
                 </ButtonLink>
               </li>
             ))}
@@ -131,7 +131,7 @@ const navSubItemButtonOrLinkProps = {
   isRounded: false,
 }
 
-function NavSubItemButtonOrLinkChildren({name, description}: NavItemContent) {
+function NavSubItemButtonOrLinkContent({name, description}: NavItemContent) {
   if (description != null) {
     return (
       <div className="flex flex-col flex-nowrap">
@@ -262,7 +262,7 @@ function NavButtonAndSubItemsDrawer({
                                   {...navSubItemButtonOrLinkProps}
                                   to={x.to}
                                 >
-                                  <NavSubItemButtonOrLinkChildren {...x} />
+                                  <NavSubItemButtonOrLinkContent {...x} />
                                 </ButtonLink>
                               ) : (
                                 <NavSubItemButtonAndMenu
