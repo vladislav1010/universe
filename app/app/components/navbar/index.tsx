@@ -24,6 +24,8 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
   setCssVar(navbarHeightCssVarName, `${height}px`)
 }
 
+const desktopMenuClassName = 'py-6'
+
 function NavSubItemButtonAndMenu({
   navItem,
 }: {
@@ -42,6 +44,7 @@ function NavSubItemButtonAndMenu({
               {
                 '-translate-x-full': open,
               },
+              desktopMenuClassName,
             )}
           >
             <ul>
@@ -158,9 +161,14 @@ function NavButtonAndMenu({
                       <CloseButton onClose={onClose} />
                     </div>
                   </Transition.Child>
-                  <div className="h-full flex flex-col py-6 bg-primary shadow-xl">
+                  <div
+                    className={clsx(
+                      'h-full flex flex-col bg-primary shadow-xl',
+                      desktopMenuClassName,
+                    )}
+                  >
                     <div className="relative flex-1">
-                      <ul className="py-8">
+                      <ul>
                         {subItems.map(x => (
                           <li
                             className="flex flex-col flex-nowrap"
