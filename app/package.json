@@ -18,7 +18,8 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext js,jsx,ts,tsx .",
     "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|less|scss|ts|tsx|md|gql|graphql|mdx|vue)\"",
     "typecheck": "tsc -b",
-    "prepare": "is-ci || cd .. && husky install front/.husky"
+    "validate": "./other/validate",
+    "prepare": "is-ci || cd .. && husky install .husky"
   },
   "dependencies": {
     "@chakra-ui/hooks": "^1.7.1",
@@ -26,6 +27,7 @@
     "@ctrl/tinycolor": "^3.4.0",
     "@headlessui/react": "^1.4.2",
     "@prisma/client": "^3.6.0",
+    "@remix-run/express": "1.0.6",
     "@remix-run/react": "^1.0.6",
     "@remix-run/serve": "^1.0.6",
     "@tailwindcss/line-clamp": "^0.3.0",
@@ -36,6 +38,7 @@
     "esbuild": "^0.14.0",
     "express": "^4.17.1",
     "express-http-proxy": "^1.6.3",
+    "lru-cache": "^6.0.0",
     "framer-motion": "^5.4.5",
     "fs-extra": "^10.0.0",
     "i18next": "^21.6.0",
@@ -65,6 +68,8 @@
     "cross-env": "^7.0.3",
     "dotenv-cli": "^4.1.1",
     "esbuild-register": "^3.2.0",
+    "eslint": "^7.32.0",
+    "eslint-config-kentcdodds": "^19.2.0",
     "husky": "^7.0.0",
     "is-ci": "^3.0.1",
     "msw": "^0.35.0",
@@ -72,11 +77,25 @@
     "postcss-cli": "^9.1.0",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.0.2",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "jest": "^27.4.5",
+    "@types/jest": "^27.0.3",
+    "jest-watch-typeahead": "^1.0.0",
+    "@types/lru-cache": "^5.1.1",
+    "glob": "^7.2.0"
   },
   "engines": {
     "node": "16",
     "npm": "8"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "eslintIgnore": [
+    "node_modules",
+    "coverage",
+    "server-build",
+    "build",
+    "public/build",
+    "*.ignored/",
+    "*.ignored.*"
+  ]
 }

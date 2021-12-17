@@ -1,37 +1,38 @@
-import i18next from "i18next";
-import { renderToString } from "react-dom/server";
-import { initReactI18next } from "react-i18next";
-import type { EntryContext } from "remix";
-import { RemixServer } from "remix";
-import { RemixI18NextProvider } from "remix-i18next";
+import i18next from 'i18next'
+import {renderToString} from 'react-dom/server'
+import {initReactI18next} from 'react-i18next'
+import type {EntryContext} from 'remix'
+import {RemixServer} from 'remix'
+import {RemixI18NextProvider} from 'remix-i18next'
+import * as React from 'react'
 
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext
+  remixContext: EntryContext,
 ) {
   // Here you also ned to initialize i18next using initReactI18next, you should
   // use the same configuration as in your client side.
   await i18next.use(initReactI18next).init({
-    supportedLngs: ["ru", "en"],
-    defaultNS: "common",
-    fallbackLng: "ru",
-    react: { useSuspense: false },
-  });
+    supportedLngs: ['ru', 'en'],
+    defaultNS: 'common',
+    fallbackLng: 'ru',
+    react: {useSuspense: false},
+  })
 
   // Then you can render your app wrapped in the RemixI18NextProvider as in the
   // entry.client file
-  let markup = renderToString(
+  const markup = renderToString(
     <RemixI18NextProvider i18n={i18next}>
       <RemixServer context={remixContext} url={request.url} />
-    </RemixI18NextProvider>
-  );
+    </RemixI18NextProvider>,
+  )
 
-  responseHeaders.set("Content-Type", "text/html");
+  responseHeaders.set('Content-Type', 'text/html')
 
-  return new Response("<!DOCTYPE html>" + markup, {
+  return new Response(`<!DOCTYPE html>${markup}`, {
     status: responseStatusCode,
     headers: responseHeaders,
-  });
+  })
 }

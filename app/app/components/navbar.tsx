@@ -30,6 +30,14 @@ interface NavItemWithSubItems<Item extends NavItem = NavItem>
 
 type NavItem = NavItemLink | NavItemWithSubItems
 
+const navSubItemButtonOrLinkProps = {
+  innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
+  className: 'w-full',
+  isRounded: false,
+}
+
+const navbarHeightCssVarName = '--navbarHeight'
+
 function navLinkOrButtonClassName({
   className,
   isSelected,
@@ -89,7 +97,7 @@ function NavSubItemButtonAndMenu({
   navItem: NavItemWithSubItems<NavItemLink>
 }) {
   return (
-    <Popover as="div" className={'relative inline-block text-left'}>
+    <Popover as="div" className="relative inline-block text-left">
       {({open, close}) => (
         <>
           <Popover.Button as={React.Fragment}>
@@ -106,15 +114,15 @@ function NavSubItemButtonAndMenu({
             )}
           >
             <ul>
-            {navItem.children.map(x => (
-              <li key={x.to}>
-                <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
-                  <NavSubItemButtonOrLinkContent {...x} />
-                </ButtonLink>
-              </li>
-            ))}
+              {navItem.children.map(x => (
+                <li key={x.to}>
+                  <ButtonLink {...navSubItemButtonOrLinkProps} to={x.to}>
+                    <NavSubItemButtonOrLinkContent {...x} />
+                  </ButtonLink>
+                </li>
+              ))}
             </ul>
-            
+
             <div className="absolute top-[1rem] left-[-1rem] transform -translate-x-full flex">
               <CloseButton onClose={() => close()} />
             </div>
@@ -125,22 +133,16 @@ function NavSubItemButtonAndMenu({
   )
 }
 
-const navSubItemButtonOrLinkProps = {
-  innerClassName: 'py-3 px-12 md:px-8 sm:px-6',
-  className: 'w-full',
-  isRounded: false,
-}
-
 function NavSubItemButtonOrLinkContent({name, description}: NavItemContent) {
-  if (description != null) {
+  if (description == null) {
+    return <span>name</span>
+  } else {
     return (
       <div className="flex flex-col flex-nowrap">
         <div>{name}</div>
         <div className="text-gray-400 text-sm">{description}</div>
       </div>
     )
-  } else {
-    return <>{name}</>
   }
 }
 
@@ -171,7 +173,7 @@ function CloseButton({
         <path
           fill="currentColor"
           d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-        ></path>
+        />
       </svg>
       <span className="sr-only">{t('navbar.drawer.close')}</span>
     </button>
@@ -211,11 +213,9 @@ function NavButtonAndSubItemsDrawer({
               <Dialog.Overlay
                 className="absolute inset-0 transition-opacity backdrop-blur-md"
                 style={{
-                  backgroundColor:
-                    '#' +
-                    new TinyColor(cssVar('--color-black'))
-                      .setAlpha(0.02)
-                      .toHex8(),
+                  backgroundColor: `#${new TinyColor(cssVar('--color-black'))
+                    .setAlpha(0.02)
+                    .toHex8()}`,
                 }}
               />
             </Transition.Child>
@@ -251,23 +251,25 @@ function NavButtonAndSubItemsDrawer({
                   <div className="h-full flex flex-col py-6 bg-white shadow-xl">
                     <div className="relative flex-1">
                       <nav>
-                        <ul className={'py-8 sm:py-6'}>
+                        <ul className="py-8 sm:py-6">
                           {subItems.map(x => (
                             <li
                               className="flex flex-col flex-nowrap"
                               key={x.to ?? x.toPrefix}
                             >
-                              {x.to != null ? (
+                              {x.to == null ? (
+                                <NavSubItemButtonAndMenu
+                                  navItem={
+                                    x as NavItemWithSubItems<NavItemLink>
+                                  }
+                                />
+                              ) : (
                                 <ButtonLink
                                   {...navSubItemButtonOrLinkProps}
                                   to={x.to}
                                 >
                                   <NavSubItemButtonOrLinkContent {...x} />
                                 </ButtonLink>
-                              ) : (
-                                <NavSubItemButtonAndMenu
-                                  navItem={x as NavItemWithSubItems<NavItemLink>}
-                                />
                               )}
                             </li>
                           ))}
@@ -285,8 +287,6 @@ function NavButtonAndSubItemsDrawer({
   )
 }
 
-const navbarHeightCssVarName = '--navbarHeight'
-
 function setNavbarHeightCssVar(el: HTMLElement | null) {
   if (!el) {
     return
@@ -298,7 +298,7 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
 }
 
 export default function Navbar() {
-  let {t} = useTranslation('common')
+  const {t} = useTranslation('common')
   const LINKS: NavItem[] = [
     {name: t('navbar.links.services.name'), to: '/services'},
     {
@@ -338,7 +338,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener('resize', _setNavbarHeightCssVar)
     }
-  }, [])
+  }, [_setNavbarHeightCssVar])
 
   return (
     <div className="px-5vw py-9 lg:py-12 sticky z-[1] bg-white" ref={navbarRef}>
@@ -356,17 +356,15 @@ export default function Navbar() {
         <ul className="hidden lg:flex">
           {LINKS.map(link => (
             <li className="px-5 py-2" key={link.to ?? link.toPrefix}>
-              {link.to != null ? (
-                <NavLink to={link.to}>{link.name}</NavLink>
+              {link.to == null ? (
+                <NavButtonAndSubItemsDrawer
+                  toPrefix={link.toPrefix}
+                  name={link.name}
+                >
+                  {link.children}
+                </NavButtonAndSubItemsDrawer>
               ) : (
-                <>
-                  <NavButtonAndSubItemsDrawer
-                    toPrefix={link.toPrefix}
-                    name={link.name}
-                  >
-                    {link.children}
-                  </NavButtonAndSubItemsDrawer>
-                </>
+                <NavLink to={link.to}>{link.name}</NavLink>
               )}
             </li>
           ))}

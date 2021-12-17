@@ -1,5 +1,6 @@
 function cssVar(name: string) {
-  // in case server side rendering
+  // TODO: Is the check right?
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return globalThis.getComputedStyle
     ? globalThis
         .getComputedStyle(document.documentElement)
@@ -9,6 +10,8 @@ function cssVar(name: string) {
 }
 
 function setCssVar(name: string, value: string) {
+  // TODO: Is the check right?
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!globalThis.document.documentElement) {
     return
   }

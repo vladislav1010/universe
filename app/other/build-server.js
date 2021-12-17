@@ -1,5 +1,7 @@
 const fsExtra = require('fs-extra')
 const path = require('path')
+// TODO:
+// eslint-disable-line import/no-extraneous-dependencies
 const glob = require('glob')
 const pkg = require('../package.json')
 
