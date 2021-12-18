@@ -3,7 +3,7 @@ import type {LinkProps} from 'remix'
 import {Link} from 'remix'
 
 type AnchorProps = React.DetailedHTMLProps<
-  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  React.ComponentPropsWithoutRef<'a'>,
   HTMLAnchorElement
 >
 

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import clsx from 'clsx'
 
 
-function Label(props: React.LabelHTMLAttributes<HTMLLabelElement>) {
+function Label(props: React.ComponentPropsWithoutRef<'label'>) {
   const {
     className,
     ...rest
@@ -14,7 +14,7 @@ function Label(props: React.LabelHTMLAttributes<HTMLLabelElement>) {
   )
 }
 
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+function Input(props: React.ComponentPropsWithoutRef<'input'>) {
   return (
     <input />
   )
@@ -26,7 +26,7 @@ function FeedbackForm() {
   return (
     <form>
       <div>
-        <Label htmlFor='topic'>t('topic.label')</Label>
+        <Label htmlFor='topic'>{t('topic.label')}</Label>
         <Input />
       </div>
     </form>
