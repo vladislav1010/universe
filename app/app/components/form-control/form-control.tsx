@@ -62,7 +62,7 @@ const [
   name: "FormControlContext",
 })
 
-type StylesProviderContext = {form: Record<'container' | 'helperText', React.CSSProperties>, formError: Record<'text' | 'icon', React.CSSProperties>};
+type StylesProviderContext = {form: Record<'container' | 'helperText', React.CSSProperties>, formError: Record<'text' | 'icon', React.CSSProperties>, label: React.CSSProperties, requiredIndicator: React.CSSProperties};
 
 const [StylesProvider, useStylesProvider] = createContext<StylesProviderContext>({
   strict: true,
