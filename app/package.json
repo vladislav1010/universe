@@ -22,6 +22,8 @@
     "prepare": "is-ci || cd .. && husky install .husky"
   },
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@chakra-ui/hooks": "^1.7.1",
     "@chakra-ui/react-utils": "^1.2.1",
     "@chakra-ui/utils": "^1.9.1",
@@ -55,12 +57,26 @@
     "remix": "^1.0.6",
     "remix-i18next": "^2.1.4"
   },
+  "babelMacros": {
+    "twin": {
+      "preset": "emotion"
+    }
+  },
   "devDependencies": {
     "@remix-run/dev": "^1.0.6",
+    "@emotion/babel-preset-css-prop": "^11.2.0",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-twin": "^1.0.2",
+    "@testing-library/cypress": "^8.0.2",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@testing-library/react-hooks": "^7.0.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/compression": "^1.7.2",
     "@types/express-http-proxy": "^1.6.3",
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.0.3",
+    "@types/jest-axe": "^3.5.3",
     "@types/lru-cache": "^5.1.1",
     "@types/morgan": "^1.9.3",
     "@types/node": "^16.11.10",
@@ -69,7 +85,9 @@
     "@types/react-dom": "^17.0.9",
     "autoprefixer": "^10.4.0",
     "cross-env": "^7.0.3",
+    "cypress": "^9.1.1",
     "dotenv-cli": "^4.1.1",
+    "esbuild-jest": "^0.5.0",
     "esbuild-register": "^3.2.0",
     "eslint": "^7.32.0",
     "eslint-config-kentcdodds": "^19.2.0",
@@ -77,12 +95,16 @@
     "husky": "^7.0.0",
     "is-ci": "^3.0.1",
     "jest": "^27.4.5",
+    "jest-axe": "^5.0.1",
     "jest-watch-typeahead": "^1.0.0",
     "msw": "^0.35.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
+    "prettier": "^2.5.1",
+    "prettier-plugin-tailwind": "^2.2.12",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.0.2",
+    "twin.macro": "^2.8.2",
     "typescript": "^4.1.2"
   },
   "engines": {
