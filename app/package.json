@@ -22,12 +22,12 @@
     "prepare": "is-ci || cd .. && husky install .husky"
   },
   "dependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
     "@chakra-ui/hooks": "^1.7.1",
     "@chakra-ui/react-utils": "^1.2.1",
     "@chakra-ui/utils": "^1.9.1",
     "@ctrl/tinycolor": "^3.4.0",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.4.2",
     "@prisma/client": "^3.6.0",
     "@remix-run/express": "1.0.6",
@@ -53,6 +53,7 @@
     "prisma": "^3.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-fast-compare": "^3.2.0",
     "react-i18next": "^11.15.1",
     "remix": "^1.0.6",
     "remix-i18next": "^2.1.4"
@@ -63,10 +64,8 @@
     }
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.0.6",
     "@emotion/babel-preset-css-prop": "^11.2.0",
-    "babel-plugin-macros": "^3.1.0",
-    "babel-plugin-twin": "^1.0.2",
+    "@remix-run/dev": "^1.0.6",
     "@testing-library/cypress": "^8.0.2",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
@@ -84,6 +83,8 @@
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
     "autoprefixer": "^10.4.0",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-twin": "^1.0.2",
     "cross-env": "^7.0.3",
     "cypress": "^9.1.1",
     "dotenv-cli": "^4.1.1",
