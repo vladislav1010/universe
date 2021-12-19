@@ -62,14 +62,14 @@ const [
   name: "FormControlContext",
 })
 
-type StylesProviderContext = Record<'container' | 'helperText', React.CSSProperties>;
+type StylesProviderContext = {form: Record<'container' | 'helperText', React.CSSProperties>, formError: Record<'text' | 'icon', React.CSSProperties>};
 
 const [StylesProvider, useStylesProvider] = createContext<StylesProviderContext>({
   strict: true,
   name: 'StylesContext'
 })
 
-export { useFormControlContext, StylesProvider }
+export { useFormControlContext, StylesProvider, useStylesProvider }
 
 function useFormControlProvider(props: FormControlContext) {
   const {
@@ -229,7 +229,7 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>((p
         <div
           {...getRootProps({}, ref)}
           className={className}
-          style={styles.container}
+          style={styles.form.container}
         />
     </FormControlProvider>
   )
@@ -257,7 +257,7 @@ export const FormHelperText = React.forwardRef<HTMLDivElement, HelpTextProps>((p
     <div
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       {...field?.getHelpTextProps(props, ref)}
-      style={styles.helperText}
+      style={styles.form.helperText}
       className={className}
     />
   )

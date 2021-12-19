@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { ariaAttr, callAllHandlers } from "@chakra-ui/utils"
 import { FocusEventHandler } from "react"
 import { FormControlOptions, useFormControlContext } from "./form-control"
@@ -65,8 +66,10 @@ export function useFormControlProps<T extends HTMLElement>(
     ...rest
   } = props
 
-  const labelIds: string[] = props["aria-describedby"]
-    ? [props["aria-describedby"]]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const labelIds: string[] = (props as any)["aria-describedby"]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ? [(props as any)["aria-describedby"]]
     : []
 
   // Error message must be described first in all scenarios.
