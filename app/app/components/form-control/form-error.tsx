@@ -17,11 +17,9 @@ export const FormErrorMessage = React.forwardRef<HTMLDivElement, FormErrorMessag
     if (!field?.isInvalid) return null
 
     return (
-      
-        <div
+      <div
           {...field?.getErrorMessageProps(props, ref)}
-          className={cx("chakra-form__error-message", props.className, 'flex items-center')}
-          style={styles.formError.text}
+          className={cx("chakra-form__error-message", props.className, 'flex items-center', styles.formError?.text)}
         />
     )
   },
@@ -41,14 +39,13 @@ export const FormErrorIcon = React.forwardRef<SVGSVGElement, React.ComponentProp
 
   if (!field?.isInvalid) return null
 
-  const _className = cx("chakra-form__error-icon", props.className)
+  const _className = cx("chakra-form__error-icon", props.className, styles.formError?.icon)
 
   return (
     <svg
       ref={ref}
       aria-hidden
       {...props}
-      style={styles.formError.icon}
       className={_className}
     >
       <path

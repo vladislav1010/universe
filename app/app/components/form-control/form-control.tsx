@@ -62,7 +62,7 @@ const [
   name: "FormControlContext",
 })
 
-type StylesProviderContext = {form: Record<'container' | 'helperText', React.CSSProperties>, formError: Record<'text' | 'icon', React.CSSProperties>, label: React.CSSProperties, requiredIndicator: React.CSSProperties};
+type StylesProviderContext = {form?: Partial<Record<'container' | 'helperText', string>>, formError?: Partial<Record<'text' | 'icon', string>>, label?: string, requiredIndicator?: string};
 
 const [StylesProvider, useStylesProvider] = createContext<StylesProviderContext>({
   strict: true,
@@ -221,7 +221,7 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>((p
     props,
   )
 
-  const className = cx("chakra-form-control", props.className)
+  const className = cx("chakra-form-control", props.className, styles.form?.container)
   const contextValue = React.useMemo(() => context, [context])
 
   return (
@@ -229,7 +229,6 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>((p
         <div
           {...getRootProps({}, ref)}
           className={className}
-          style={styles.form.container}
         />
     </FormControlProvider>
   )
@@ -252,12 +251,11 @@ export interface HelpTextProps extends React.ComponentPropsWithoutRef<"div"> {}
 export const FormHelperText = React.forwardRef<HTMLDivElement, HelpTextProps>((props, ref) => {
   const field = useFormControlContext()
   const styles = useStylesProvider()
-  const className = cx("chakra-form__helper-text", props.className)
+  const className = cx("chakra-form__helper-text", props.className, styles.form?.helperText)
   return (
     <div
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       {...field?.getHelpTextProps(props, ref)}
-      style={styles.form.helperText}
       className={className}
     />
   )

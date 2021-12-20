@@ -69,12 +69,11 @@ export const RequiredIndicator = React.forwardRef<HTMLSpanElement, RequiredIndic
 
     if (!field?.isRequired) return null
 
-    const className = cx("chakra-form__required-indicator", props.className)
+    const className = cx("chakra-form__required-indicator", props.className, styles.requiredIndicator)
 
     return (
       <span
         {...field?.getRequiredIndicatorProps(props, ref)}
-        style={styles.requiredIndicator}
         className={className}
       />
     )
