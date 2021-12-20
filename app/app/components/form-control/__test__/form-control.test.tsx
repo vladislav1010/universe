@@ -12,6 +12,7 @@ import {
   RequiredIndicator,
   useFormControl,
 } from "../"
+import { StylesProvider } from "../form-control"
 
 type OmittedTypes = "disabled" | "required" | "readOnly"
 type InputProps = Omit<React.ComponentPropsWithoutRef<'input'>, OmittedTypes> &
@@ -26,39 +27,43 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 it("passes a11y test in default state", async () => {
   await testA11y(
+    <StylesProvider value={{}}>
     <FormControl id="name">
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
       <FormErrorMessage>Your name is invalid</FormErrorMessage>
-    </FormControl>,
+    </FormControl>
+    </StylesProvider>,
   )
 })
 
 it("passes a11y test in when required", async () => {
   await testA11y(
+    <StylesProvider value={{}}>
     <FormControl id="name" isRequired>
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
       <FormErrorMessage>Your name is invalid</FormErrorMessage>
-    </FormControl>,
+    </FormControl>
+    </StylesProvider>,
   )
 })
 
 it("passes a11y test in when invalid", async () => {
-  await testA11y(
+  await testA11y(<StylesProvider value={{}}>
     <FormControl id="name" isInvalid>
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
       <FormErrorMessage>Your name is invalid</FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 })
 
 test("only displays error icon and message when invalid", () => {
-  const { rerender } = render(
+  const { rerender } = render(<StylesProvider value={{}}>
     <FormControl id="name" isInvalid>
       <FormLabel>Name</FormLabel>
       <RequiredIndicator />
@@ -68,13 +73,13 @@ test("only displays error icon and message when invalid", () => {
       <FormErrorMessage data-testid="message">
         Your name is invalid
       </FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   expect(screen.getByTestId("icon")).toBeVisible()
   expect(screen.getByTestId("message")).toBeVisible()
 
-  rerender(
+  rerender(<StylesProvider value={{}}>
     <FormControl id="name">
       <FormLabel>Name</FormLabel>
       <RequiredIndicator />
@@ -84,7 +89,7 @@ test("only displays error icon and message when invalid", () => {
       <FormErrorMessage data-testid="message">
         Your name is invalid
       </FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   expect(screen.queryByTestId("icon")).not.toBeInTheDocument()
@@ -92,13 +97,13 @@ test("only displays error icon and message when invalid", () => {
 })
 
 test("only displays required indicator when required", () => {
-  const { rerender } = render(
+  const { rerender } = render(<StylesProvider value={{}}>
     <FormControl id="name" isRequired>
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
       <FormErrorMessage>Your name is invalid</FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   const indicator = screen.getByRole("presentation", { hidden: true })
@@ -106,13 +111,13 @@ test("only displays required indicator when required", () => {
   expect(indicator).toBeVisible()
   expect(indicator).toHaveTextContent("*")
 
-  rerender(
+  rerender(<StylesProvider value={{}}>
     <FormControl id="name">
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
       <FormErrorMessage>Your name is invalid</FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   expect(screen.queryByRole("presentation")).not.toBeInTheDocument()
@@ -122,7 +127,7 @@ test("useFormControl calls provided input callbacks", () => {
   const onFocus = jest.fn()
   const onBlur = jest.fn()
 
-  render(
+  render(<StylesProvider value={{}}>
     <FormControl id="name">
       <FormLabel>Name</FormLabel>
       <Input
@@ -131,7 +136,7 @@ test("useFormControl calls provided input callbacks", () => {
         onFocus={onFocus}
         onBlur={onBlur}
       />
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
   const input = screen.getByTestId("input")
 
@@ -142,21 +147,21 @@ test("useFormControl calls provided input callbacks", () => {
 })
 
 test("has the proper aria attributes", async () => {
-  const { rerender } = render(
+  const { rerender } = render(<StylesProvider value={{}}>
     <FormControl id="name">
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
       <FormHelperText>Enter your name please!</FormHelperText>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
   let input = screen.getByLabelText(/Name/)
 
   expect(input).toHaveAttribute("aria-describedby", "name-helptext")
   expect(input).not.toHaveAttribute("aria-invalid")
-  expect(input).not.toHaveAttribute("aria-required")
+  expect(input).not.toBeRequired()
   expect(input).not.toHaveAttribute("aria-readonly")
 
-  rerender(
+  rerender(<StylesProvider value={{}}>
     <FormControl id="name" isRequired isInvalid isReadOnly>
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
@@ -164,14 +169,14 @@ test("has the proper aria attributes", async () => {
       <FormErrorMessage data-testid="error">
         Your name is invalid
       </FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
   input = screen.getByLabelText(/Name/)
   const indicator = screen.getByRole("presentation", { hidden: true })
   const errorMessage = screen.getByTestId("error")
 
   expect(input).toHaveAttribute("aria-invalid", "true")
-  expect(input).toHaveAttribute("aria-required", "true")
+  expect(input).toBeRequired()
   expect(input).toHaveAttribute("aria-readonly", "true")
   expect(input).toHaveAttribute(
     "aria-describedby",
@@ -182,11 +187,11 @@ test("has the proper aria attributes", async () => {
 })
 
 test("has the correct role attributes", () => {
-  render(
+  render(<StylesProvider value={{}}>
     <FormControl data-testid="control" id="name" isRequired>
       <FormLabel>Name</FormLabel>
       <Input placeholder="Name" />
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
   const control = screen.getByTestId("control")
 
@@ -195,7 +200,7 @@ test("has the correct role attributes", () => {
 })
 
 test("has the correct data attributes", async () => {
-  render(
+  render(<StylesProvider value={{}}>
     <FormControl
       data-testid="control"
       id="name"
@@ -213,7 +218,7 @@ test("has the correct data attributes", async () => {
       <FormErrorMessage data-testid="error-message">
         Your name is invalid.
       </FormErrorMessage>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   fireEvent.focus(screen.getByLabelText(/Name/))
@@ -231,14 +236,14 @@ test("can provide a custom aria-describedby reference", () => {
     "reference",
   )
 
-  rerender(
+  rerender(<StylesProvider value={{}}>
     <FormControl id="name">
       <Input aria-describedby="name-expanded-helptext" />
       <FormHelperText>Please enter your name!</FormHelperText>
       <p id="name-expanded-helptext">
         Sometimes it can be really helpfull to enter a name, trust me.
       </p>
-    </FormControl>,
+    </FormControl></StylesProvider>,
   )
 
   expect(screen.getByRole("textbox")).toHaveAttribute(

@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import clsx from 'clsx'
 
 function FeedbackForm() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {t} = useTranslation('feedback')
 
   return (
     <form>
-      <div>
-      </div>
+      <div />
     </form>
   )
 }
