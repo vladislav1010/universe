@@ -62,7 +62,7 @@ const [
   name: "FormControlContext",
 })
 
-type StylesProviderContext = {form?: Partial<Record<'container' | 'helperText', string>>, formError?: Partial<Record<'text' | 'icon', string>>, label?: string, requiredIndicator?: string};
+export type StylesProviderContext = {form?: Partial<Record<'container' | 'helperText', string>>, formError?: Partial<Record<'text' | 'icon', string>>, label?: string, requiredIndicator?: string};
 
 const [StylesProvider, useStylesProvider] = createContext<StylesProviderContext>({
   strict: true,
