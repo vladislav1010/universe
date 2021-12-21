@@ -131,7 +131,7 @@ function NavButtonAndDrawer({
       <Dialog
         as="div"
         static
-        className="fixed inset-0 overflow-hidden"
+        className={clsx("fixed inset-0 overflow-hidden", {'hidden': !isOpen})}
         open={isOpen}
         onClose={onClose}
       >
