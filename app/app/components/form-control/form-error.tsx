@@ -29,6 +29,9 @@ if (__DEV__) {
   FormErrorMessage.displayName = "FormErrorMessage"
 }
 
+// to communicate error or success you should never rely only on color. 
+// For people with red-green color blindness a green and a red border look almost the same. 
+// It's impossible for them to see if there was an error or success. Add text or an icon to make it obvious.
 /**
  * Used as the visual indicator that a field is invalid or
  * a field has incorrect values.

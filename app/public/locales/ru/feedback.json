@@ -1,5 +1,5 @@
 {
-  "topic": {
-    "label": "Тема"
+  "form": {
+    "email": "Email"
   }
 }
