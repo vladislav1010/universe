@@ -72,6 +72,7 @@
 
 body {
   overflow-x: hidden;
+  color: var(--text-primary);
 }
 
 * {

@@ -21,7 +21,7 @@ function ButtonInner({name, description}: NavItemContent) {
     return (
       <div className="flex flex-col flex-nowrap">
         <div>{name}</div>
-        <div className="text-gray-400 text-sm">{description}</div>
+        <div className="text-gray-400 dark:text-gray-200 text-sm">{description}</div>
       </div>
     )
   }

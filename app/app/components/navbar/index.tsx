@@ -26,7 +26,7 @@ function setNavbarHeightCssVar(el: HTMLElement | null) {
 
 const desktopMenuClassName = 'py-6'
 
-const panelLevel2ClassName = 'bg-[#f2f4f7]'
+const panelLevel2ClassName = 'bg-gray-200 dark:bg-gray-800'
 
 const transformForChangingContainingBlockClassName = 'transform scale-100'
 

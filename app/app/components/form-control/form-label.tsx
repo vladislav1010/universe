@@ -38,11 +38,10 @@ export const FormLabel = React.forwardRef<HTMLLabelElement, FormLabelProps>(
     return (
       <label
         {...ownProps}
-        className={cx("chakra-form__label", props.className)}
+        className={cx("chakra-form__label", props.className, styles.label)}
         style={{
           display: "block",
           textAlign: "start",
-          ...styles,
         }}
       >
         {children}

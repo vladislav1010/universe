@@ -47,7 +47,7 @@ function ButtonInner({
       <div
         className={clsx(
           'focus-ring absolute inset-0 opacity-100 disabled:opacity-50 transform transition transition-ease-in',
-          'group-hover:bg-[rgba(15,48,106,.05)]',
+          'group-hover:bg-[rgba(77,136,255,.08)]',
           {
             'rounded-full': isRounded,
           },
