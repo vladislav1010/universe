@@ -13,7 +13,7 @@ function Input({className, ...rest}: InputProps) {
   // the outline ensures that there maintains a visible focus on interaction with the field.
   // https://egghead.io/lessons/scss-use-sass-mixins-to-style-inputs-with-accessible-contrast-and-keyboard-access
   return (
-    <input className={clsx(className, 'text-base-iOSZoomIntoFieldFix h-10 px-4 py-0 font-sans rounded-none font-medium w-full min-w-0 outline-none appearance-none transition duration-200 border-none border-b border-secondary bg-transparent read-only:shadow-[none !important] select-all focus:border-team-current focus:shadow-[0px 1px 0px 0px] focus:shadow-team-current text-primary hover:border-team-current hover:shadow-[0 1px 0 0] hover:shadow-team-current focus:outline-transparent focus:outline-2')} {...rest} />
+    <input className={clsx(className, 'text-base-iOSZoomIntoFieldFix h-10 px-4 py-0 font-sans rounded-none font-medium w-full min-w-0 outline-none appearance-none transition duration-200 border-b border-secondary bg-transparent read-only:shadow-[none !important] select-all focus:border-team-current focus:shadow-[0px 1px 0px 0px] focus:shadow-team-current text-primary focus:outline-transparent focus:outline-2')} {...rest} />
   )
 }
 
