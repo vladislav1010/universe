@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import * as React from 'react'
 import {
   useControlledSwitchWarning,
@@ -90,6 +91,7 @@ const Checkbox = ({
   initialIsActive,
   readOnly,
   title,
+  rootClassName,
   ...inputProps
 }: Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -97,6 +99,7 @@ const Checkbox = ({
 > &
   UseToggleProps & {
     title: string
+    rootClassName?: string
   }) => {
   const {getTogglerProps, isActive} = useToggle({
     isActive: controlledIsActive,
@@ -106,7 +109,7 @@ const Checkbox = ({
   })
 
   return (
-    <div className="inline-flex">
+    <div className={clsx(rootClassName, 'inline-flex')}>
       <label htmlFor={inputProps.id} className="sr-only">
         {title}
       </label>
