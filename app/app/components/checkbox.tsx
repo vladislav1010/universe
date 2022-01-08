@@ -3,6 +3,7 @@ import {
   useControlledSwitchWarning,
   useOnChangeReadOnlyWarning,
 } from '~/util/react/controlled'
+import {OutlineToggleButton} from './outline-toggle-button'
 
 function callAll<T extends unknown[]>(
   ...fns: (((...args: T) => void) | undefined)[]
@@ -64,8 +65,9 @@ const useToggle = ({
   function getTogglerProps({
     onClick,
     ...props
-  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  React.HTMLAttributes<any> = {}) {
+  }: // TODO: proper types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any = {}) {
     return {
       'aria-pressed': isActive,
       onClick: callAll(onClick, async () =>
@@ -87,12 +89,15 @@ const Checkbox = ({
   onChange,
   initialIsActive,
   readOnly,
+  title,
   ...inputProps
 }: Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'type' | 'readOnly' | 'onChange' | 'value'
 > &
-  UseToggleProps) => {
+  UseToggleProps & {
+    title: string
+  }) => {
   const {getTogglerProps, isActive} = useToggle({
     isActive: controlledIsActive,
     onChange,
@@ -101,10 +106,24 @@ const Checkbox = ({
   })
 
   return (
-    <div className="">
-      <input type="checkbox" hidden {...inputProps} />
-      {/* TODO */}
-      <button {...getTogglerProps({})} aria-label="Переключить " />
+    <div className="inline-flex">
+      <label htmlFor={inputProps.id} className="sr-only">
+        {title}
+      </label>
+      <input
+        type="checkbox"
+        hidden
+        {...inputProps}
+        checked={isActive}
+        readOnly
+      />
+      <OutlineToggleButton
+        {...getTogglerProps({
+          isActive,
+        })}
+      >
+        {title}
+      </OutlineToggleButton>
     </div>
   )
 }
