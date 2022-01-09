@@ -1,5 +1,7 @@
 {
   "form": {
-    "email": "Email"
+    "email": "Ваш Email",
+    "name": "Ваше имя",
+    "aboutProject": "Расскажите нам о Вашем проекте"
   }
 }
