@@ -21,7 +21,7 @@ function FeedbackForm() {
       <StylesProvider value={styles}>
         <div className={styles.form?.container}>
           <h1 className={clsx('block text-left', styles.label)}>
-            I'm interested in...
+            {t('form.interestedIn')}
           </h1>
           {interestedIn.map(title => (
             <Checkbox key={title} title={title} rootClassName="mr-4" />
