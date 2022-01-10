@@ -1,9 +1,11 @@
 import clsx from 'clsx'
 import * as React from 'react'
 import {useTranslation} from 'react-i18next'
-import {Checkbox, Radio, useInput} from './checkbox'
+import Checkbox from './checkbox'
+import useInput from './use-input'
 import {FormControl, FormLabel, styles, StylesProvider} from './form-control'
 import {Input, Textarea} from './input'
+import Radio from './radio'
 
 const interestedIn = [
   'Site from scratch',
