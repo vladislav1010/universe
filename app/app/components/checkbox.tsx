@@ -15,7 +15,7 @@ function callAll<T extends unknown[]>(
 function useInput<T extends Exclude<unknown, undefined>>({
   initialInput,
   onChange,
-  isActive: controlledIsActive,
+  input: controlledInput,
   readOnly = false,
 }: UseInputProps<T>) {
   const {current: initialState} = React.useRef(initialInput)
@@ -23,12 +23,12 @@ function useInput<T extends Exclude<unknown, undefined>>({
 
   if (process.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useControlledSwitchWarning(controlledIsActive, 'isActive', 'useCheckbox')
+    useControlledSwitchWarning(controlledInput, 'input', 'useInput')
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useOnChangeReadOnlyWarning(
-      controlledIsActive,
-      'isActive',
-      'useCheckbox',
+      controlledInput,
+      'input',
+      'useInput',
       Boolean(onChange),
       readOnly,
       'readOnly',
@@ -37,18 +37,18 @@ function useInput<T extends Exclude<unknown, undefined>>({
     )
   }
 
-  const isActiveIsControlled = controlledIsActive !== undefined
-  const isActive = isActiveIsControlled ? controlledIsActive : state
+  const inputIsControlled = controlledInput !== undefined
+  const input = inputIsControlled ? controlledInput : state
 
   async function dispatchWithOnChange(action: React.SetStateAction<T>) {
-    if (!isActiveIsControlled) {
+    if (!inputIsControlled) {
       // https://github.com/kentcdodds/react-hooks/blob/main/src/exercise/06.md#3--store-the-state-in-an-object
       // the function probably is called asynchronously by client code
       setState(action)
     }
 
     if (action instanceof Function) {
-      onChange?.(action(isActive))
+      onChange?.(action(input))
     } else {
       onChange?.(action)
     }
@@ -56,14 +56,14 @@ function useInput<T extends Exclude<unknown, undefined>>({
 
   return {
     dispatchWithOnChange,
-    isActive,
+    input,
   }
 }
 
 interface UseInputProps<T extends Exclude<unknown, undefined>> {
   initialInput: T
-  onChange?: (isActive: T) => void
-  isActive?: T
+  onChange?: (input: T) => void
+  input?: T
   readOnly?: boolean
 }
 
@@ -72,13 +72,13 @@ interface UseInputProps<T extends Exclude<unknown, undefined>> {
 function useToggle({
   initialInput,
   onChange,
-  isActive: controlledIsActive,
+  input: controlledInput,
   readOnly = false,
 }: UseInputProps<boolean>) {
   const useInputReturn = useInput<boolean>({
     initialInput,
     onChange,
-    isActive: controlledIsActive,
+    input: controlledInput,
     readOnly,
   })
 
@@ -89,7 +89,7 @@ function useToggle({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any = {}) {
     return {
-      'aria-pressed': useInputReturn.isActive,
+      'aria-pressed': useInputReturn.input,
       onClick: callAll(onClick, async () =>
         useInputReturn.dispatchWithOnChange(_isActive => !_isActive),
       ),
@@ -104,7 +104,7 @@ function useToggle({
 }
 
 const Checkbox = ({
-  isActive: controlledIsActive,
+  input: controlledInput,
   onChange,
   initialInput,
   readOnly,
@@ -119,8 +119,8 @@ const Checkbox = ({
     title: string
     rootClassName?: string
   }) => {
-  const {getTogglerProps, isActive} = useToggle({
-    isActive: controlledIsActive,
+  const {getTogglerProps, input: isActive} = useToggle({
+    input: controlledInput,
     onChange,
     initialInput,
     readOnly,
