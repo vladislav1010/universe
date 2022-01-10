@@ -46,7 +46,7 @@ const useToggle = ({
     )
   }
 
-  const isActiveIsControlled = controlledIsActive != null
+  const isActiveIsControlled = controlledIsActive !== undefined
   const isActive = isActiveIsControlled ? controlledIsActive : state
 
   async function dispatchWithOnChange(action: React.SetStateAction<boolean>) {
