@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import * as React from 'react'
 import {useTranslation} from 'react-i18next'
-import Checkbox from './checkbox'
+import {Checkbox, Radio, useInput} from './checkbox'
 import {FormControl, FormLabel, styles, StylesProvider} from './form-control'
 import {Input, Textarea} from './input'
 
@@ -11,10 +11,16 @@ const interestedIn = [
   'HTML/CSS coding',
 ]
 
+const costs = ['1-10k', '20-30k', '30-40k']
+
 function FeedbackForm() {
   const {t} = useTranslation('feedback')
 
   const [value, setValue] = React.useState('')
+
+  const {dispatchWithOnChange, input} = useInput<string | null>({
+    initialInput: null,
+  })
 
   return (
     <form className="flex flex-col space-y-4">
@@ -29,6 +35,25 @@ function FeedbackForm() {
               title={title}
               rootClassName="mr-4"
               initialInput={false}
+            />
+          ))}
+        </div>
+        <div className={styles.form?.container}>
+          <h1 className={clsx('block text-left', styles.label)}>
+            {t('form.costs')}
+          </h1>
+          {costs.map(title => (
+            <Radio
+              key={title}
+              title={title}
+              value={title}
+              name={'cost'}
+              id={`cost_${title}`}
+              rootClassName="mr-4"
+              isActive={title === input}
+              onClick={() => {
+                dispatchWithOnChange(title)
+              }}
             />
           ))}
         </div>

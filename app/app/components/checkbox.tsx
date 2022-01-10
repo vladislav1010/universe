@@ -12,7 +12,8 @@ function callAll<T extends unknown[]>(
   return (...args: T) => fns.forEach(fn => fn?.(...args))
 }
 
-function useInput<T extends Exclude<unknown, undefined>>({
+// TODO: Exclude<unknown, undefined> doesn't work
+export function useInput<T extends Exclude<unknown, undefined>>({
   initialInput,
   onChange,
   input: controlledInput,
@@ -40,7 +41,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
   const inputIsControlled = controlledInput !== undefined
   const input = inputIsControlled ? controlledInput : state
 
-  async function dispatchWithOnChange(action: React.SetStateAction<T>) {
+  function dispatchWithOnChange(action: React.SetStateAction<T>) {
     if (!inputIsControlled) {
       // https://github.com/kentcdodds/react-hooks/blob/main/src/exercise/06.md#3--store-the-state-in-an-object
       // the function probably is called asynchronously by client code
@@ -67,6 +68,16 @@ interface UseInputProps<T extends Exclude<unknown, undefined>> {
   readOnly?: boolean
 }
 
+const getTogglerPropsExceptOnClick = (
+  props: // TODO: proper types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any = {},
+  isActive: boolean,
+) => ({
+  'aria-pressed': isActive,
+  ...props,
+})
+
 // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
 // Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
 function useToggle({
@@ -89,11 +100,10 @@ function useToggle({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any = {}) {
     return {
-      'aria-pressed': useInputReturn.input,
       onClick: callAll(onClick, async () =>
         useInputReturn.dispatchWithOnChange(_isActive => !_isActive),
       ),
-      ...props,
+      ...getTogglerPropsExceptOnClick(props, useInputReturn.input),
     }
   }
 
@@ -102,6 +112,40 @@ function useToggle({
     getTogglerProps,
   }
 }
+
+const Radio = ({
+  isActive,
+  title,
+  rootClassName,
+  onClick,
+  ...inputProps
+}: Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'readOnly' | 'onChange' | 'checked'
+> & {
+  isActive: boolean
+  title: string
+  rootClassName?: string
+  onClick: () => void
+}) => (
+  <div className={clsx(rootClassName, 'inline-flex')}>
+    <label htmlFor={inputProps.id} className="sr-only">
+      {title}
+    </label>
+    <input type="radio" hidden {...inputProps} checked={isActive} readOnly />
+    <OutlineToggleButton
+      {...getTogglerPropsExceptOnClick(
+        {
+          onClick,
+        },
+        isActive,
+      )}
+      isActive={isActive}
+    >
+      {title}
+    </OutlineToggleButton>
+  </div>
+)
 
 const Checkbox = ({
   input: controlledInput,
@@ -113,7 +157,7 @@ const Checkbox = ({
   ...inputProps
 }: Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'readOnly' | 'onChange' | 'value'
+  'type' | 'readOnly' | 'onChange' | 'value' | 'checked'
 > &
   UseInputProps<boolean> & {
     title: string
@@ -149,4 +193,4 @@ const Checkbox = ({
   )
 }
 
-export default Checkbox
+export {Checkbox, Radio}

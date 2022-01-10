@@ -3,6 +3,7 @@
     "email": "Your Email",
     "name": "Your name",
     "aboutProject": "Tell us about Your project",
-    "interestedIn": "I'm interested in..."
+    "interestedIn": "I'm interested in...",
+    "costs": "Project budget (USD)"
   }
 }
