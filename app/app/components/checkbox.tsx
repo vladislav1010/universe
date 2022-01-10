@@ -69,12 +69,12 @@ interface UseInputProps<T extends Exclude<unknown, undefined>> {
 
 // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
 // Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
-function useToggle<T extends Exclude<unknown, undefined>>({
+function useToggle({
   initialIsActive = false,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
-}: UseInputProps<T>) {
+}: UseInputProps<boolean>) {
   const useInputReturn = useInput<boolean>({
     initialIsActive,
     onChange,
