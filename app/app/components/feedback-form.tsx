@@ -28,7 +28,7 @@ function FeedbackForm() {
               key={title}
               title={title}
               rootClassName="mr-4"
-              initialIsActive={false}
+              initialInput={false}
             />
           ))}
         </div>

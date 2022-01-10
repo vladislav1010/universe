@@ -13,12 +13,12 @@ function callAll<T extends unknown[]>(
 }
 
 function useInput<T extends Exclude<unknown, undefined>>({
-  initialIsActive,
+  initialInput,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
 }: UseInputProps<T>) {
-  const {current: initialState} = React.useRef(initialIsActive)
+  const {current: initialState} = React.useRef(initialInput)
   const [state, setState] = React.useState<T>(initialState)
 
   if (process.env.NODE_ENV !== 'production') {
@@ -32,7 +32,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
       Boolean(onChange),
       readOnly,
       'readOnly',
-      'initialIsActive',
+      'initialInput',
       'onChange',
     )
   }
@@ -61,7 +61,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
 }
 
 interface UseInputProps<T extends Exclude<unknown, undefined>> {
-  initialIsActive: T
+  initialInput: T
   onChange?: (isActive: T) => void
   isActive?: T
   readOnly?: boolean
@@ -70,13 +70,13 @@ interface UseInputProps<T extends Exclude<unknown, undefined>> {
 // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
 // Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
 function useToggle({
-  initialIsActive,
+  initialInput,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
 }: UseInputProps<boolean>) {
   const useInputReturn = useInput<boolean>({
-    initialIsActive,
+    initialInput,
     onChange,
     isActive: controlledIsActive,
     readOnly,
@@ -106,7 +106,7 @@ function useToggle({
 const Checkbox = ({
   isActive: controlledIsActive,
   onChange,
-  initialIsActive,
+  initialInput,
   readOnly,
   title,
   rootClassName,
@@ -122,7 +122,7 @@ const Checkbox = ({
   const {getTogglerProps, isActive} = useToggle({
     isActive: controlledIsActive,
     onChange,
-    initialIsActive,
+    initialInput,
     readOnly,
   })
 
