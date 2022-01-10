@@ -17,7 +17,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
-}: UseToggleProps<T>) {
+}: UseInputProps<T>) {
   const {current: initialState} = React.useRef(initialIsActive)
   const [state, setState] = React.useState<boolean>(initialState)
 
@@ -60,7 +60,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
   }
 }
 
-interface UseToggleProps<T extends Exclude<unknown, undefined>> {
+interface UseInputProps<T extends Exclude<unknown, undefined>> {
   initialIsActive?: boolean
   onChange?: (isActive: boolean) => void
   isActive?: boolean
@@ -74,7 +74,7 @@ function useToggle<T extends Exclude<unknown, undefined>>({
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
-}: UseToggleProps<T>) {
+}: UseInputProps<T>) {
   const useInputReturn = useInput<boolean>({
     initialIsActive,
     onChange,
@@ -115,7 +115,7 @@ const Checkbox = ({
   React.InputHTMLAttributes<HTMLInputElement>,
   'type' | 'readOnly' | 'onChange' | 'value'
 > &
-  UseToggleProps<boolean> & {
+  UseInputProps<boolean> & {
     title: string
     rootClassName?: string
   }) => {
