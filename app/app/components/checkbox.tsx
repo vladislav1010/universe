@@ -12,6 +12,8 @@ function callAll<T extends unknown[]>(
   return (...args: T) => fns.forEach(fn => fn?.(...args))
 }
 
+type Zz = boolean
+
 function useInput<T extends Exclude<unknown, undefined>>({
   initialIsActive,
   onChange,
@@ -19,7 +21,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
   readOnly = false,
 }: UseInputProps<T>) {
   const {current: initialState} = React.useRef(initialIsActive)
-  const [state, setState] = React.useState<boolean>(initialState)
+  const [state, setState] = React.useState<Zz>(initialState)
 
   if (process.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -40,7 +42,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
   const isActiveIsControlled = controlledIsActive !== undefined
   const isActive = isActiveIsControlled ? controlledIsActive : state
 
-  async function dispatchWithOnChange(action: React.SetStateAction<boolean>) {
+  async function dispatchWithOnChange(action: React.SetStateAction<Zz>) {
     if (!isActiveIsControlled) {
       // https://github.com/kentcdodds/react-hooks/blob/main/src/exercise/06.md#3--store-the-state-in-an-object
       // the function probably is called asynchronously by client code
