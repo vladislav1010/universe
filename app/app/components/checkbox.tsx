@@ -12,16 +12,7 @@ function callAll<T extends unknown[]>(
   return (...args: T) => fns.forEach(fn => fn?.(...args))
 }
 
-interface UseToggleProps<T extends Exclude<unknown, undefined>> {
-  initialIsActive?: boolean
-  onChange?: (isActive: boolean) => void
-  isActive?: boolean
-  readOnly?: boolean
-}
-
-// https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
-// Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
-function useToggle<T extends Exclude<unknown, undefined>>({
+function useInput<T extends Exclude<unknown, undefined>>({
   initialIsActive = false,
   onChange,
   isActive: controlledIsActive,
@@ -63,6 +54,34 @@ function useToggle<T extends Exclude<unknown, undefined>>({
     }
   }
 
+  return {
+    dispatchWithOnChange,
+    isActive,
+  }
+}
+
+interface UseToggleProps<T extends Exclude<unknown, undefined>> {
+  initialIsActive?: boolean
+  onChange?: (isActive: boolean) => void
+  isActive?: boolean
+  readOnly?: boolean
+}
+
+// https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
+// Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
+function useToggle<T extends Exclude<unknown, undefined>>({
+  initialIsActive = false,
+  onChange,
+  isActive: controlledIsActive,
+  readOnly = false,
+}: UseToggleProps<T>) {
+  const useInputReturn = useInput<boolean>({
+    initialIsActive,
+    onChange,
+    isActive: controlledIsActive,
+    readOnly,
+  })
+
   function getTogglerProps({
     onClick,
     ...props
@@ -70,18 +89,17 @@ function useToggle<T extends Exclude<unknown, undefined>>({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any = {}) {
     return {
-      'aria-pressed': isActive,
+      'aria-pressed': useInputReturn.isActive,
       onClick: callAll(onClick, async () =>
-        dispatchWithOnChange(_isActive => !_isActive),
+        useInputReturn.dispatchWithOnChange(_isActive => !_isActive),
       ),
       ...props,
     }
   }
 
   return {
-    dispatchWithOnChange,
+    ...useInputReturn,
     getTogglerProps,
-    isActive,
   }
 }
 
