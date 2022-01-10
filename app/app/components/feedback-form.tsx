@@ -47,7 +47,7 @@ function FeedbackForm() {
               key={title}
               title={title}
               value={title}
-              name={'cost'}
+              name="cost"
               id={`cost_${title}`}
               rootClassName="mr-4"
               isActive={title === input}
