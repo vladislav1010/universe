@@ -35,6 +35,8 @@ function FeedbackForm() {
             <Checkbox
               key={title}
               title={title}
+              name={`interestedIn_${title}`}
+              id={`interestedIn_${title}`}
               rootClassName="mr-4"
               initialInput={false}
             />
