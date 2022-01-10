@@ -13,7 +13,7 @@ function callAll<T extends unknown[]>(
 }
 
 function useInput<T extends Exclude<unknown, undefined>>({
-  initialIsActive = false,
+  initialIsActive,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
@@ -61,7 +61,7 @@ function useInput<T extends Exclude<unknown, undefined>>({
 }
 
 interface UseInputProps<T extends Exclude<unknown, undefined>> {
-  initialIsActive?: boolean
+  initialIsActive: boolean
   onChange?: (isActive: boolean) => void
   isActive?: boolean
   readOnly?: boolean
@@ -70,7 +70,7 @@ interface UseInputProps<T extends Exclude<unknown, undefined>> {
 // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
 // Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
 function useToggle({
-  initialIsActive = false,
+  initialIsActive,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,

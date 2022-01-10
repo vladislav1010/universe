@@ -24,7 +24,12 @@ function FeedbackForm() {
             {t('form.interestedIn')}
           </h1>
           {interestedIn.map(title => (
-            <Checkbox key={title} title={title} rootClassName="mr-4" />
+            <Checkbox
+              key={title}
+              title={title}
+              rootClassName="mr-4"
+              initialIsActive={false}
+            />
           ))}
         </div>
         <FormControl id="name">
