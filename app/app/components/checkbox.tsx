@@ -12,7 +12,7 @@ function callAll<T extends unknown[]>(
   return (...args: T) => fns.forEach(fn => fn?.(...args))
 }
 
-interface UseToggleProps {
+interface UseToggleProps<T extends Exclude<unknown, undefined>> {
   initialIsActive?: boolean
   onChange?: (isActive: boolean) => void
   isActive?: boolean
@@ -21,12 +21,12 @@ interface UseToggleProps {
 
 // https://reactjs.org/blog/2020/08/10/react-v17-rc.html#other-breaking-changes
 // Additionally, React 17 will always execute all effect cleanup functions (for all components) before it runs any new effects.
-const useToggle = ({
+function useToggle<T extends Exclude<unknown, undefined>>({
   initialIsActive = false,
   onChange,
   isActive: controlledIsActive,
   readOnly = false,
-}: UseToggleProps) => {
+}: UseToggleProps<T>) {
   const {current: initialState} = React.useRef(initialIsActive)
   const [state, setState] = React.useState<boolean>(initialState)
 
@@ -97,7 +97,7 @@ const Checkbox = ({
   React.InputHTMLAttributes<HTMLInputElement>,
   'type' | 'readOnly' | 'onChange' | 'value'
 > &
-  UseToggleProps & {
+  UseToggleProps<boolean> & {
     title: string
     rootClassName?: string
   }) => {
