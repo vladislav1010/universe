@@ -19,6 +19,7 @@ import vendorStyles from './styles/vendors.css'
 import appStyles from './styles/app.css'
 import noScriptStyles from './styles/no-script.css'
 import * as React from 'react'
+import StylesContext from './StylesContext'
 
 // https://remix.run/api/app#links
 export const links: LinksFunction = () => {
@@ -108,6 +109,8 @@ function Document({
   children: React.ReactNode
   title?: string
 }) {
+  const styles = React.useContext(StylesContext)
+
   return (
     <html lang="en">
       <head>
@@ -122,6 +125,7 @@ function Document({
           crossOrigin="anonymous"
         />
         <Links />
+        {styles}
         <noscript>
           <link rel="stylesheet" href={noScriptStyles} />
         </noscript>

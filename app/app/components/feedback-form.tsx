@@ -6,6 +6,7 @@ import useInput from './use-input'
 import {FormControl, FormLabel, styles, StylesProvider} from './form-control'
 import {Input, Textarea} from './input'
 import Radio from './radio'
+import FileInput from './file-input'
 
 const interestedIn = [
   'Site from scratch',
@@ -79,6 +80,18 @@ function FeedbackForm() {
             }}
           />
         </FormControl>
+        <div className={styles.form?.container}>
+          <FileInput
+            multiple
+            name="attachment[]"
+            onChange={e => {
+              if (e.target.files?.[0]) {
+                const data = new FormData()
+                data.append('file', e.target.files[0])
+              }
+            }}
+          />
+        </div>
       </StylesProvider>
     </form>
   )
