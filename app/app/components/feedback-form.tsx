@@ -19,11 +19,12 @@ const costs = ['1-10k', '20-30k', '30-40k']
 function FeedbackForm() {
   const {t} = useTranslation('feedback')
 
-  const [value, setValue] = React.useState('')
+  const [aboutProjectValue, setAboutProjectValue] = React.useState('')
 
-  const {dispatchWithOnChange, input} = useInput<string | null>({
-    initialInput: null,
-  })
+  const {dispatchWithOnChange: costsDispatchWithOnChange, input: costsValue} =
+    useInput<string | null>({
+      initialInput: null,
+    })
 
   return (
     <form className="flex flex-col space-y-4">
@@ -55,9 +56,9 @@ function FeedbackForm() {
               name="cost"
               id={`cost_${title}`}
               rootClassName="mr-4"
-              isActive={title === input}
+              isActive={title === costsValue}
               onClick={() => {
-                dispatchWithOnChange(title)
+                costsDispatchWithOnChange(title)
               }}
             />
           ))}
@@ -74,9 +75,9 @@ function FeedbackForm() {
           <FormLabel>{t('form.aboutProject')}</FormLabel>
           <Textarea
             name="aboutProject"
-            value={value}
+            value={aboutProjectValue}
             onChange={e => {
-              setValue(e.target.value)
+              setAboutProjectValue(e.target.value)
             }}
           />
         </FormControl>
