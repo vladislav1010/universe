@@ -1,6 +1,34 @@
 import * as React from 'react'
 import svgsprites from '../../public/svgsprites.svg'
 import {useId} from '@chakra-ui/hooks'
+import styled from '@emotion/styled'
+
+const Label = styled.label({
+  WebkitAppearance: 'button',
+  textAlign: 'inherit',
+  textTransform: 'inherit',
+  textIndent: 'inherit',
+  textDecoration: 'none',
+  '&:hover span::before': {
+    transform: 'scaleX(1)',
+  },
+})
+
+const LabelText = styled.span({
+  '&::before': {
+    content: '""',
+    display: 'block',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: '-0.25rem',
+    height: '1px',
+    transform: 'scaleX(0)',
+    transformOrigin: 'right center',
+    background: 'currentColor',
+    transition: 'transform .7s cubic-bezier(.19,1,.22,1),transition-orign 0s',
+  },
+})
 
 function FileInput(props: React.ComponentPropsWithoutRef<'input'>) {
   const id = useId()
@@ -13,40 +41,17 @@ function FileInput(props: React.ComponentPropsWithoutRef<'input'>) {
         className="opacity-0 overflow-hidden w-[0.1px] h-[0.1px] absolute z-[-1]"
         {...props}
       />
-      <label
-        className="relative block h-auto m-0 p-0 z-[2] color-inherit bg-[0 0] border-0 outline-0 tracking-tight no-underline transition-opacity duration-300 cursor-pointer font-semibold text-2xl"
-        style={{
-          WebkitAppearance: 'button',
-          textAlign: 'inherit',
-          textTransform: 'inherit',
-          textIndent: 'inherit',
-          textDecoration: 'none',
-        }}
+      <Label
+        className="relative block h-auto m-0 p-0 z-[2] color-inherit bg-[0 0] border-0 outline-0 tracking-tight no-underline transition-opacity duration-300 cursor-pointer font-semibold text-lg"
         htmlFor={id}
       >
-        <svg className="inline-block w-4 h-4 fill-current align-middle mr-8 text-lg leading-[0] transition-transform duration-300">
+        <svg className="inline-block w-4 h-4 fill-current align-middle mr-4 text-lg leading-[0] transition-transform duration-300">
           <use xlinkHref={`${svgsprites}#attachment`} />
         </svg>
-        <span
-          className="relative inline-block align-middle"
-          style={{
-            content: '""',
-            display: 'block',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: '-0.25rem',
-            height: '1px',
-            transform: 'scaleX(0)',
-            transformOrigin: 'right center',
-            background: 'currentColor',
-            transition:
-              'transform .7s cubic-bezier(.19,1,.22,1),transition-orign 0s',
-          }}
-        >
+        <LabelText className="relative inline-block align-middle">
           Добавить прикрепление
-        </span>
-      </label>
+        </LabelText>
+      </Label>
     </div>
   )
 }
