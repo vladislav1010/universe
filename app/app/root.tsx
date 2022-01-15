@@ -112,7 +112,7 @@ function Document({
   const styles = React.useContext(StylesContext)
 
   return (
-    <html lang="en">
+    <html lang="ru">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
