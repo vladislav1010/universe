@@ -1,3 +1,4 @@
+import {useId} from '@chakra-ui/hooks'
 import clsx from 'clsx'
 import * as React from 'react'
 import {OutlineToggleButton} from './outline-toggle-button'
@@ -14,12 +15,14 @@ const Checkbox = ({
   ...inputProps
 }: Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'readOnly' | 'onChange' | 'value' | 'checked'
+  'type' | 'readOnly' | 'onChange' | 'value' | 'checked' | 'id'
 > &
   UseInputProps<boolean> & {
     title: string
     rootClassName?: string
   }) => {
+  const id = useId()
+
   const {getTogglerProps, input: isActive} = useToggle({
     input: controlledInput,
     onChange,
@@ -29,10 +32,11 @@ const Checkbox = ({
 
   return (
     <div className={clsx(rootClassName, 'inline-flex')}>
-      <label htmlFor={inputProps.id} className="sr-only">
+      <label htmlFor={id} className="sr-only">
         {title}
       </label>
       <input
+        id={id}
         type="checkbox"
         hidden
         {...inputProps}

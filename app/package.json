@@ -41,9 +41,11 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-http-proxy": "^1.6.3",
+    "faunadb": "^4.4.1",
     "framer-motion": "^5.4.5",
     "fs-extra": "^10.0.0",
     "i18next": "^21.6.0",
+    "joi": "^17.5.0",
     "lru-cache": "^6.0.0",
     "morgan": "^1.10.0",
     "on-finished": "^2.3.0",
@@ -55,13 +57,13 @@
     "react-dom": "^17.0.2",
     "react-fast-compare": "^3.2.0",
     "react-i18next": "^11.15.1",
+    "react-query": "^3.34.8",
     "remix": "^1.1.1",
     "remix-i18next": "^2.1.5",
     "styled-components": "^5.3.3",
     "warning": "^4.0.3"
   },
   "devDependencies": {
-    "esbuild": "0.13.14",
     "@cloudflare/workers-types": "^2.2.2",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@remix-run/dev": "^1.1.1",
@@ -89,6 +91,7 @@
     "cross-env": "^7.0.3",
     "cypress": "^9.1.1",
     "dotenv-cli": "^4.1.1",
+    "esbuild": "0.13.14",
     "esbuild-jest": "^0.5.0",
     "esbuild-register": "^3.2.0",
     "eslint": "^7.32.0",
@@ -99,6 +102,7 @@
     "jest": "^27.4.5",
     "jest-axe": "^5.0.1",
     "jest-watch-typeahead": "^1.0.0",
+    "miniflare": "2.0.0-next.3",
     "msw": "^0.35.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
@@ -106,8 +110,7 @@
     "prettier-plugin-tailwind": "^2.2.12",
     "rimraf": "^3.0.2",
     "tailwindcss": "^3.0.2",
-    "typescript": "^4.1.2",
-    "miniflare": "2.0.0-next.3"
+    "typescript": "^4.1.2"
   },
   "engines": {
     "node": "16",
