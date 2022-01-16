@@ -369,7 +369,7 @@ function FeedbackForm() {
           {deletedImageIds.map(deletedImageId => (
             <input
               value={deletedImageId}
-              name="imageIdToDelete[]"
+              name="imageIdToDelete"
               key={deletedImageId}
               type="hidden"
             />
