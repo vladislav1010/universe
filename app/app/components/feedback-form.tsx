@@ -29,6 +29,7 @@ import type {DirectCreatorUploadSuccess} from '../lib/cloudflare/image/direct-cr
 import deleteImage from '../lib/cloudflare/image/delete-image'
 import Joi, {ValidationError} from 'joi'
 import {Feedback, createFeedback as faunaCreateFeedback} from '../lib/faunadb'
+import {Button} from './button'
 
 const interestedIn = [
   'Site from scratch',
@@ -38,6 +39,11 @@ const interestedIn = [
 
 const costs = ['1-10k', '20-30k', '30-40k']
 
+const nameValidationMessage =
+  'Имя может содержать только кириллицу и пробел, должно быть от 3 до 100 символов.'
+
+const emailValidationMessage = 'Email должен иметь Tld com, net или ru'
+
 // TODO: security
 const createFeedback = async (feedback: Feedback) => {
   // TODO: messages
@@ -45,16 +51,20 @@ const createFeedback = async (feedback: Feedback) => {
     name: Joi.string()
       .required()
       .pattern(new RegExp('^[a-zA-Z а-яёА-ЯЁ]{3,100}$'))
-      .message(
-        'Имя может содержать только кириллицу и пробел, должно быть от 3 до 100 символов.',
-      ),
+      .message(nameValidationMessage)
+      .messages({
+        'string.empty': nameValidationMessage,
+      }),
     email: Joi.string()
       .required()
       .email({
         minDomainSegments: 2,
         tlds: {allow: ['com', 'net', 'ru']},
       })
-      .message('Email должен иметь Tld com, net или ru'),
+      .message(emailValidationMessage)
+      .messages({
+        'string.empty': emailValidationMessage,
+      }),
     aboutProject: Joi.string()
       .pattern(new RegExp(/^[a-zA-Z а-яёА-ЯЁ0-9,.!?:;'"\t\n\r()-]{0,1000}$/))
       .message(
@@ -91,7 +101,13 @@ const createFeedback = async (feedback: Feedback) => {
     // TODO: What it it?
     return {
       success: false,
-      errors: (error as ValidationError).details,
+      errors: (error as ValidationError).details.reduce(
+        (result, e) => ({
+          ...result,
+          [e.path[0]]: e.message,
+        }),
+        {},
+      ),
       data: feedback,
     }
   } else {
@@ -307,7 +323,7 @@ function FeedbackForm() {
             <FormLabel>{t('form.email')}</FormLabel>
             <Input
               name="email"
-              type="email"
+              type="text"
               defaultValue={actionData?.data.email}
             />
             <FormErrorMessage>
@@ -359,9 +375,9 @@ function FeedbackForm() {
             />
           ))}
           <div>
-            <button type="submit">
+            <Button type="submit" className="py-2 px-6">
               {transition.state === 'submitting' ? 'Отправка...' : 'Отправить'}
-            </button>
+            </Button>
           </div>
         </fieldset>
       </Form>

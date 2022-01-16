@@ -67,13 +67,13 @@ function ButtonInner({
   )
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps & Omit<JSX.IntrinsicElements['button'], 'children'>>(function Button({
-  children,
-  className,
-  innerClassName,
-  isRounded = true,
-  ...buttonProps
-}, ref) {
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & Omit<JSX.IntrinsicElements['button'], 'children'>
+>(function Button(
+  {children, className, innerClassName, isRounded = true, ...buttonProps},
+  ref,
+) {
   return (
     <button {...buttonProps} className={getClassName({className})} ref={ref}>
       <ButtonInner className={innerClassName} isRounded={isRounded}>
