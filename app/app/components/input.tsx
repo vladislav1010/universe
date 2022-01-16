@@ -1,11 +1,20 @@
 import clsx from 'clsx'
 import * as React from 'react'
+import styled from 'styled-components'
+import {FormControlOptions, useFormControl} from './form-control'
 
 const inputAndTextareaClassName =
   'text-base-iOSZoomIntoFieldFix px-4 py-0 rounded-none font-medium w-full min-w-0 outline-none appearance-none transition duration-200 border-b border-secondary bg-transparent read-only:shadow-[none !important] select-all focus:border-team-current focus:shadow-[0px 1px 0px 0px] focus:shadow-team-current text-primary focus:outline-transparent focus:outline-2'
 
+type Omitted = 'disabled' | 'required' | 'readOnly' | 'size'
+
 // TODO: Is :invalid needed?
-function Input({className, ...rest}: React.ComponentPropsWithRef<'input'>) {
+const Input = React.forwardRef<
+  HTMLInputElement,
+  Omit<React.ComponentPropsWithRef<'input'>, Omitted> & FormControlOptions
+>(function Input(ownProps, ref) {
+  const input = useFormControl<HTMLInputElement>(ownProps)
+
   // mobile iOS bug field text.
   // https://egghead.io/lessons/scss-create-reset-styles-to-normalize-form-fields-cross-browser
   // The reason we maintain an outline is that for users on Windows,
@@ -15,11 +24,12 @@ function Input({className, ...rest}: React.ComponentPropsWithRef<'input'>) {
   // https://egghead.io/lessons/scss-use-sass-mixins-to-style-inputs-with-accessible-contrast-and-keyboard-access
   return (
     <input
-      className={clsx(className, inputAndTextareaClassName, 'h-10')}
-      {...rest}
+      {...input}
+      className={clsx(ownProps.className, inputAndTextareaClassName, 'h-10')}
+      ref={ref}
     />
   )
-}
+})
 
 const textareaAndAutoGrowUtilStyle = {
   className:
@@ -29,15 +39,22 @@ const textareaAndAutoGrowUtilStyle = {
   },
 }
 
-function Textarea({
-  className,
-  ...rest
-}: Omit<React.ComponentPropsWithRef<'textarea'>, 'value' | 'onChange'> & {
-  rootClassName?: string
-  value: string
-  onChange: React.ChangeEventHandler<HTMLTextAreaElement>
-}) {
-  const valueFixEndingNewline = rest.value.replace(/(\r\n|\r|\n)$/, '$1 ')
+const StyledTextarea = styled.textarea(textareaAndAutoGrowUtilStyle.style)
+
+const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  Omit<
+    React.ComponentPropsWithRef<'textarea'>,
+    'value' | 'onChange' | Omitted
+  > & {
+    rootClassName?: string
+    value: string
+    onChange: React.ChangeEventHandler<HTMLTextAreaElement>
+  } & FormControlOptions
+>(function Textarea({rootClassName, ...ownProps}, ref) {
+  const textarea = useFormControl<HTMLTextAreaElement>(ownProps)
+
+  const valueFixEndingNewline = ownProps.value.replace(/(\r\n|\r|\n)$/, '$1 ')
 
   return (
     <div className="items-center inline-grid w-full">
@@ -50,20 +67,20 @@ function Textarea({
       >
         {valueFixEndingNewline}
       </span>
-      <textarea
-        {...rest}
+      <StyledTextarea
+        {...textarea}
         rows={1}
         spellCheck={false}
         className={clsx(
-          className,
+          ownProps.className,
           inputAndTextareaClassName,
           'resize-none',
           textareaAndAutoGrowUtilStyle.className,
         )}
-        style={textareaAndAutoGrowUtilStyle.style}
+        ref={ref}
       />
     </div>
   )
-}
+})
 
 export {Input, Textarea}
