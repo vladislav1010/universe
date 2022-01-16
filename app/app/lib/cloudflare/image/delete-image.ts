@@ -4,7 +4,7 @@ const deleteImage = (imageId: string) =>
     {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
+        Authorization: `Bearer ${process.env.CLOUDFLARE_IMAGES_TOKEN}`,
       },
     },
   ).catch(() => {})

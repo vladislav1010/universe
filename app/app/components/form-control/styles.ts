@@ -9,7 +9,7 @@ const styles: StylesProviderContext = {
   label:
     'text-base mr-3 mb-2 font-medium transition-opacity duration-200 opacity-100 disabled:opacity-40 text-gray-400',
   formError: {
-    icon: 'mr-[0.5em] text-red-500',
+    icon: 'mr-[0.5em] text-red-500 w-3 h-3',
     text: 'text-red-500 mt-2 text-sm',
   },
 }

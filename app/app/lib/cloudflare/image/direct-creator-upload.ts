@@ -8,7 +8,6 @@ export interface DirectCreatorUploadUnknownError {
 export interface DirectCreatorUploadSuccess {
   success: true
   result: {
-    id: string
     uploadURL: string
   }
   result_info?: never
@@ -17,10 +16,9 @@ export interface DirectCreatorUploadSuccess {
 }
 
 //TODO: What else is important?
-type ApiResponse =
+type GetOneTimeUrlApiResponse =
   | {
       result: {
-        id: string
         uploadURL: string
       }
       success: true
@@ -32,19 +30,19 @@ type ApiResponse =
 const directCreatorUploadGetOneTimeUrl = async (): Promise<
   DirectCreatorUploadUnknownError | DirectCreatorUploadSuccess
 > => {
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/images/v1/direct_upload`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.CLOUDFLARE_TOKEN}`,
-      },
-    },
-  )
-
   try {
-    const data: ApiResponse = await response.json()
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/images/v1/direct_upload`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.CLOUDFLARE_IMAGES_TOKEN}`,
+        },
+      },
+    )
+
+    const data: GetOneTimeUrlApiResponse = await response.json()
 
     if (data.success) {
       const {success, result} = data
@@ -66,17 +64,33 @@ const directCreatorUploadGetOneTimeUrl = async (): Promise<
   }
 }
 
+interface UploadImageSuccessApiResponse {
+  success: true
+  result: {
+    id: string
+    variants: [string]
+  }
+}
+
 const useDirectCreatorUploadImage = () =>
-  useMutation<void, unknown, [formData: FormData, uploadURL: string]>(
+  useMutation<
+    {id: string; url: string},
+    unknown,
+    [formData: FormData, uploadURL: string]
+  >(
     ([formData, uploadURL]) =>
       fetch(uploadURL, {
         method: 'POST',
         body: formData,
-      }).then(response => {
+      }).then(async response => {
         // TODO:
         if (!response.ok) {
           throw new Error()
         }
+
+        const data: UploadImageSuccessApiResponse = await response.json()
+
+        return {id: data.result.id, url: data.result.variants[0]}
       }),
     {},
   )

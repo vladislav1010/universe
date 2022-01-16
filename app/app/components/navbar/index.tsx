@@ -131,7 +131,7 @@ function NavButtonAndDrawer({
       <Dialog
         as="div"
         static
-        className={clsx("fixed inset-0 overflow-hidden", {'hidden': !isOpen})}
+        className={clsx('fixed inset-0 overflow-hidden', {hidden: !isOpen})}
         open={isOpen}
         onClose={onClose}
       >
@@ -436,7 +436,7 @@ function MobileMenuList({items, open}: {items: NavItem[]; open: boolean}) {
 export default function Navbar() {
   const {t} = useTranslation('common')
   const ITEMS: NavItem[] = [
-    {name: t('navbar.links.services.name'), to: '/services'},
+    {name: t('navbar.links.services.name'), to: '/contacts'},
     {
       name: t('navbar.links.test.name'),
       toPrefix: '/test',

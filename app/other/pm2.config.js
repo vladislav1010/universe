@@ -1,6 +1,11 @@
 module.exports = {
   apps: [
     {
+      name: 'Miniflare',
+      script: 'miniflare --build-command "npm run dev:worker" --watch --open',
+      ignore_watch: ['.'],
+    },
+    {
       name: 'Remix',
       script: 'remix watch',
       ignore_watch: ['.'],

@@ -20,6 +20,10 @@ import appStyles from './styles/app.css'
 import noScriptStyles from './styles/no-script.css'
 import * as React from 'react'
 import StylesContext from './StylesContext'
+import {useSafeLayoutEffect} from '@chakra-ui/hooks'
+import {QueryClient, QueryClientProvider} from 'react-query'
+
+const queryClient = new QueryClient()
 
 // https://remix.run/api/app#links
 export const links: LinksFunction = () => {
@@ -41,11 +45,13 @@ export default function App() {
   useRemixI18Next(locale)
 
   return (
-    <Document>
-      <Layout>
-        <Outlet />
-      </Layout>
-    </Document>
+    <QueryClientProvider client={queryClient}>
+      <Document>
+        <Layout>
+          <Outlet />
+        </Layout>
+      </Document>
+    </QueryClientProvider>
   )
 }
 
@@ -53,13 +59,13 @@ export default function App() {
 
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
 export function ErrorBoundary({error}: {error: Error}) {
-  console.error(error)
   return (
     <Document title="Error!">
       <Layout>
         <div>
           <h1>There was an error</h1>
           <p>{error.message}</p>
+          <p>{JSON.stringify(error.stack)}</p>
         </div>
       </Layout>
     </Document>
@@ -111,6 +117,10 @@ function Document({
 }) {
   const styles = React.useContext(StylesContext)
 
+  useSafeLayoutEffect(() => {
+    document.head.insertAdjacentHTML('beforeend', styles!)
+  })
+
   return (
     <html lang="ru">
       <head>
@@ -125,7 +135,6 @@ function Document({
           crossOrigin="anonymous"
         />
         <Links />
-        {styles}
         <noscript>
           <link rel="stylesheet" href={noScriptStyles} />
         </noscript>

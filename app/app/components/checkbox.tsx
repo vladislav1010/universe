@@ -40,6 +40,7 @@ const Checkbox = ({
         type="checkbox"
         hidden
         {...inputProps}
+        value={title}
         checked={isActive}
         readOnly
       />

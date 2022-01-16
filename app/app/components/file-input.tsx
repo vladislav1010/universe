@@ -1,7 +1,7 @@
 import * as React from 'react'
 import svgsprites from '../../public/svgsprites.svg'
 import {useId} from '@chakra-ui/hooks'
-import styled from '@emotion/styled'
+import styled from 'styled-components'
 
 const Label = styled.label({
   WebkitAppearance: 'button',
@@ -11,6 +11,9 @@ const Label = styled.label({
   textDecoration: 'none',
   '&:hover span::before': {
     transform: 'scaleX(1)',
+  },
+  '&[data-disabled="true"]': {
+    opacity: 0.6,
   },
 })
 
@@ -42,7 +45,8 @@ function FileInput(props: React.ComponentPropsWithoutRef<'input'>) {
         {...props}
       />
       <Label
-        className="relative block h-auto m-0 p-0 z-[2] color-inherit bg-[0 0] border-0 outline-0 tracking-tight no-underline transition-opacity duration-300 cursor-pointer font-semibold text-lg"
+        data-disabled={props.disabled}
+        className="block h-auto m-0 p-0 color-inherit bg-[0 0] border-0 outline-0 tracking-tight no-underline transition-opacity duration-300 cursor-pointer font-semibold text-lg"
         htmlFor={id}
       >
         <svg className="inline-block w-4 h-4 fill-current align-middle mr-4 text-lg leading-[0] transition-transform duration-300">

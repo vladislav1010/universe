@@ -26,49 +26,93 @@ import directCreatorUploadGetOneTimeUrl, {
   useDirectCreatorUploadImage,
 } from '../lib/cloudflare/image/direct-creator-upload'
 import type {DirectCreatorUploadSuccess} from '../lib/cloudflare/image/direct-creator-upload'
-import imageDeliveryUrl, {
-  variantNameTODOMeaning,
-} from '../lib/cloudflare/image/image-delivery-url'
 import deleteImage from '../lib/cloudflare/image/delete-image'
 import Joi, {ValidationError} from 'joi'
 import {Feedback, createFeedback as faunaCreateFeedback} from '../lib/faunadb'
 
+const interestedIn = [
+  'Site from scratch',
+  'Frontend development',
+  'HTML/CSS coding',
+]
+
+const costs = ['1-10k', '20-30k', '30-40k']
+
 // TODO: security
 const createFeedback = async (feedback: Feedback) => {
-  try {
-    // TODO: messages
-    const schema = Joi.object({
-      name: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z а-яёА-ЯЁ]{3,100}$'))
-        .message('q'),
-      email: Joi.string()
-        .email({
-          minDomainSegments: 2,
-          tlds: {allow: ['com', 'net', 'ru']},
-        })
-        .message(''),
-      aboutProject: Joi.string()
-        .pattern(new RegExp(/^[a-zA-Z а-яёА-ЯЁ0-9,.;'"\t\n\r()-]$/))
-        .message(''),
-    })
+  // TODO: messages
+  const schema = Joi.object({
+    name: Joi.string()
+      .required()
+      .pattern(new RegExp('^[a-zA-Z а-яёА-ЯЁ]{3,100}$'))
+      .message(
+        'Имя может содержать только кириллицу и пробел, должно быть от 3 до 100 символов.',
+      ),
+    email: Joi.string()
+      .required()
+      .email({
+        minDomainSegments: 2,
+        tlds: {allow: ['com', 'net', 'ru']},
+      })
+      .message('Email должен иметь Tld com, net или ru'),
+    aboutProject: Joi.string()
+      .pattern(new RegExp(/^[a-zA-Z а-яёА-ЯЁ0-9,.!?:;'"\t\n\r()-]{0,1000}$/))
+      .message(
+        'О проекте может содержать только кириллицу, цифры, символы: ,.!?:;\'"-() табуляцию и перевод строки, должно быть не более 1000 символов',
+      ),
+    cost: Joi.string().allow(...costs),
+    interestedIn: Joi.array().allow(...interestedIn),
+    image: Joi.string()
+      .uri({scheme: 'https'})
+      .custom((value: string | null | undefined) => {
+        if (value == null) {
+          return value
+        }
+        if (!value.startsWith('https://imagedelivery.net')) {
+          throw new Error('')
+        }
+        // TODO: security
+        if (
+          value.includes('?') ||
+          value.includes('#') ||
+          value.includes(encodeURIComponent('#')) ||
+          value.includes(encodeURIComponent('?'))
+        ) {
+          throw new Error('')
+        }
 
-    schema.validate(feedback)
+        return value
+      }),
+  })
 
-    await faunaCreateFeedback(feedback)
-  } catch (err: unknown) {
+  const {error} = schema.validate(feedback)
+
+  if (error) {
     // TODO: What it it?
-    return (err as ValidationError).details
+    return {
+      success: false,
+      errors: (error as ValidationError).details,
+      data: feedback,
+    }
+  } else {
+    return {
+      success: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: ((await faunaCreateFeedback(feedback)) as any).data,
+    }
   }
 }
 
 export const action: ActionFunction = async ({request}) => {
   const body = await request.formData()
 
-  await createFeedback({
+  const image = body.get('image') as string | null
+
+  const result = await createFeedback({
     name: (body.get('name') as string | null) ?? '',
     email: (body.get('email') as string | null) ?? '',
     cost: (body.get('cost') as string | null) ?? undefined,
-    image: (body.get('image') as string | null) ?? undefined,
+    image: (image === '' ? null : image) ?? undefined,
     interestedIn: body.getAll('interestedIn') as string[],
   })
 
@@ -78,15 +122,16 @@ export const action: ActionFunction = async ({request}) => {
       deleteImage(imageId),
     ),
   )
+
+  return result
 }
 
 interface FeedbackFormData {
   feedback: {
     attachment: DirectCreatorUploadSuccess['result']
   }
-  variantName: string
   ENV: {
-    imageAccountHash: string
+    accountId: string
   }
 }
 
@@ -98,9 +143,8 @@ export const loader: LoaderFunction = async () => {
       feedback: {
         attachment: result.result,
       },
-      variantName: variantNameTODOMeaning,
       ENV: {
-        imageAccountHash: process.env.CLOUDFLARE_IMAGES_ACCOUNT_HASH,
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
       },
     }
 
@@ -112,22 +156,10 @@ export const loader: LoaderFunction = async () => {
 
 const attachmentImageLayoutClassName = 'w-40 h-40 mt-4'
 
-const interestedIn = [
-  'Site from scratch',
-  'Frontend development',
-  'HTML/CSS coding',
-]
-
-const costs = ['1-10k', '20-30k', '30-40k']
-
 function FeedbackForm() {
   const {t} = useTranslation('feedback')
 
-  const {
-    feedback,
-    variantName,
-    ENV: {imageAccountHash},
-  } = useLoaderData<FeedbackFormData>()
+  const {feedback} = useLoaderData<FeedbackFormData>()
 
   const [deletedImageIds, setDeletedImageIds] = React.useState<string[]>([])
 
@@ -139,17 +171,76 @@ function FeedbackForm() {
   const actionData = useActionData()
 
   const [aboutProjectValue, setAboutProjectValue] = React.useState(
-    actionData?.values.aboutProject ?? '',
+    actionData?.data.aboutProject ?? '',
   )
 
   const {dispatchWithOnChange: costsDispatchWithOnChange, input: costsValue} =
     useInput<string | null>({
-      initialInput: actionData?.values.cost ?? null,
+      initialInput: actionData?.data.cost ?? null,
     })
 
   return (
     <StylesProvider value={styles}>
-      <Form className="flex flex-col space-y-4" method="post" action="/">
+      <div className="mb-8">
+        <FormControl id="attachment" isInvalid={uploadImageResult.isError}>
+          <FileInput
+            disabled={transition.state === 'submitting'}
+            onChange={e => {
+              if (e.target.files?.[0]) {
+                const formData = new FormData()
+                formData.append('file', e.target.files[0])
+
+                uploadImageResult.mutate([
+                  formData,
+                  feedback.attachment.uploadURL,
+                ])
+              }
+            }}
+          />
+          <FormErrorMessage>
+            <FormErrorIcon />
+            {uploadImageResult.isError
+              ? 'Произошла непредвиденная ошибка'
+              : null}
+          </FormErrorMessage>
+        </FormControl>
+        {uploadImageResult.isLoading ? (
+          <div
+            className={clsx(
+              'animate-pulse bg-slate-200',
+              attachmentImageLayoutClassName,
+            )}
+          />
+        ) : uploadImageResult.isSuccess &&
+          !deletedImageIds.includes(uploadImageResult.data.id) ? (
+          <div className={clsx(attachmentImageLayoutClassName, 'relative')}>
+            <img
+              className="object-contain object-center"
+              src={uploadImageResult.data.url}
+              alt={`Изображение 1`}
+            />
+            <button
+              className="absolute flex items-center justify-center h-7 w-7 border-2 rounded-full focus:outline-none overflow-hidden transition hover:border-primary focus:border-primary right-2 top-2"
+              onClick={() => {
+                setDeletedImageIds(x => [...x, uploadImageResult.data.id])
+              }}
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" className="w-3 h-3" focusable="false">
+                <g fill="currentColor">
+                  <path d="M19.452 7.5H4.547a.5.5 0 00-.5.545l1.287 14.136A2 2 0 007.326 24h9.347a2 2 0 001.992-1.819L19.95 8.045a.5.5 0 00-.129-.382.5.5 0 00-.369-.163zm-9.2 13a.75.75 0 01-1.5 0v-9a.75.75 0 011.5 0zm5 0a.75.75 0 01-1.5 0v-9a.75.75 0 011.5 0zM22 4h-4.75a.25.25 0 01-.25-.25V2.5A2.5 2.5 0 0014.5 0h-5A2.5 2.5 0 007 2.5v1.25a.25.25 0 01-.25.25H2a1 1 0 000 2h20a1 1 0 000-2zM9 3.75V2.5a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v1.25a.25.25 0 01-.25.25h-5.5A.25.25 0 019 3.75z" />
+                </g>
+              </svg>
+              <span className="sr-only">Удалить</span>
+            </button>
+          </div>
+        ) : null}
+      </div>
+      <Form
+        className="flex flex-col space-y-4"
+        method="post"
+        action="/contacts"
+      >
         <fieldset disabled={transition.state === 'submitting'}>
           <div className={styles.form?.container}>
             <h1 className={clsx('block text-left', styles.label)}>
@@ -159,10 +250,11 @@ function FeedbackForm() {
               <Checkbox
                 key={title}
                 title={title}
-                name="interestedIn[]"
+                disabled={transition.state === 'submitting'}
+                name="interestedIn"
                 rootClassName="mr-4"
                 initialInput={
-                  actionData?.values.interestedIn.includes(title) ?? false
+                  actionData?.data.interestedIn.includes(title) ?? false
                 }
               />
             ))}
@@ -177,6 +269,7 @@ function FeedbackForm() {
                 title={title}
                 value={title}
                 name="cost"
+                disabled={transition.state === 'submitting'}
                 id={`cost_${title}`}
                 rootClassName="mr-4"
                 isActive={title === costsValue}
@@ -189,45 +282,45 @@ function FeedbackForm() {
           <FormControl
             id="name"
             isInvalid={
-              actionData?.errors.name && transition.state !== 'submitting'
+              actionData?.errors?.name && transition.state !== 'submitting'
             }
           >
             <FormLabel>{t('form.name')}</FormLabel>
             <Input
               name="name"
               type="text"
-              defaultValue={actionData?.values.name}
+              defaultValue={actionData?.data.name}
             />
             <FormErrorMessage>
               <FormErrorIcon />
-              {actionData?.errors.name && transition.state !== 'submitting'
-                ? actionData.errors.name
+              {actionData?.errors?.name && transition.state !== 'submitting'
+                ? actionData.errors?.name
                 : null}
             </FormErrorMessage>
           </FormControl>
           <FormControl
             id="email"
             isInvalid={
-              actionData?.errors.email && transition.state !== 'submitting'
+              actionData?.errors?.email && transition.state !== 'submitting'
             }
           >
             <FormLabel>{t('form.email')}</FormLabel>
             <Input
               name="email"
               type="email"
-              defaultValue={actionData?.values.email}
+              defaultValue={actionData?.data.email}
             />
             <FormErrorMessage>
               <FormErrorIcon />
-              {actionData?.errors.email && transition.state !== 'submitting'
-                ? actionData.errors.email
+              {actionData?.errors?.email && transition.state !== 'submitting'
+                ? actionData.errors?.email
                 : null}
             </FormErrorMessage>
           </FormControl>
           <FormControl
             id="aboutProject"
             isInvalid={
-              actionData?.errors.aboutProject &&
+              actionData?.errors?.aboutProject &&
               transition.state !== 'submitting'
             }
           >
@@ -241,9 +334,9 @@ function FeedbackForm() {
             />
             <FormErrorMessage>
               <FormErrorIcon />
-              {actionData?.errors.aboutProject &&
+              {actionData?.errors?.aboutProject &&
               transition.state !== 'submitting'
-                ? actionData.errors.aboutProject
+                ? actionData.errors?.aboutProject
                 : null}
             </FormErrorMessage>
           </FormControl>
@@ -251,12 +344,8 @@ function FeedbackForm() {
             type="hidden"
             value={
               uploadImageResult.isSuccess &&
-              !deletedImageIds.includes(feedback.attachment.id)
-                ? imageDeliveryUrl({
-                    imageAccountHash,
-                    variantName,
-                    imageId: feedback.attachment.id,
-                  })
+              !deletedImageIds.includes(uploadImageResult.data.id)
+                ? uploadImageResult.data.url
                 : ''
             }
             name="image"
@@ -271,68 +360,11 @@ function FeedbackForm() {
           ))}
           <div>
             <button type="submit">
-              {transition.state === 'submitting' ? 'Creating...' : 'Create'}
+              {transition.state === 'submitting' ? 'Отправка...' : 'Отправить'}
             </button>
           </div>
         </fieldset>
       </Form>
-      {/* TODO: form control component is invalid */}
-      <FormControl id="attachment" isInvalid={uploadImageResult.isError}>
-        <FileInput
-          name="attachment"
-          onChange={e => {
-            if (e.target.files?.[0]) {
-              const formData = new FormData()
-              formData.append(e.target.name, e.target.files[0])
-
-              uploadImageResult.mutate([
-                formData,
-                feedback.attachment.uploadURL,
-              ])
-            }
-          }}
-        />
-        <FormErrorMessage>
-          <FormErrorIcon />
-          {uploadImageResult.isError ? 'Произошла непредвиденная ошибка' : null}
-        </FormErrorMessage>
-      </FormControl>
-      {uploadImageResult.isLoading ? (
-        <div
-          className={clsx(
-            'animate-pulse bg-slate-200',
-            attachmentImageLayoutClassName,
-          )}
-        />
-      ) : uploadImageResult.isSuccess &&
-        !deletedImageIds.includes(feedback.attachment.id) ? (
-        <div className={clsx(attachmentImageLayoutClassName, 'relative')}>
-          <div className="absolute inset-0 opacity-50 bg-stripes-gray" />
-          <img
-            className="object-contain object-center"
-            src={imageDeliveryUrl({
-              imageAccountHash,
-              variantName,
-              imageId: feedback.attachment.id,
-            })}
-            alt={`Изображение 1`}
-          />
-          <button
-            className="absolute flex items-center justify-center h-7 w-7 border-2 rounded-full focus:outline-none overflow-hidden transition hover:border-primary focus:border-primary right-2 top-2"
-            onClick={() => {
-              setDeletedImageIds(x => [...x, feedback.attachment.id])
-            }}
-            type="button"
-          >
-            <svg viewBox="0 0 24 24" className="w-3 h-3" focusable="false">
-              <g fill="currentColor">
-                <path d="M19.452 7.5H4.547a.5.5 0 00-.5.545l1.287 14.136A2 2 0 007.326 24h9.347a2 2 0 001.992-1.819L19.95 8.045a.5.5 0 00-.129-.382.5.5 0 00-.369-.163zm-9.2 13a.75.75 0 01-1.5 0v-9a.75.75 0 011.5 0zm5 0a.75.75 0 01-1.5 0v-9a.75.75 0 011.5 0zM22 4h-4.75a.25.25 0 01-.25-.25V2.5A2.5 2.5 0 0014.5 0h-5A2.5 2.5 0 007 2.5v1.25a.25.25 0 01-.25.25H2a1 1 0 000 2h20a1 1 0 000-2zM9 3.75V2.5a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v1.25a.25.25 0 01-.25.25h-5.5A.25.25 0 019 3.75z" />
-              </g>
-            </svg>
-            <span className="sr-only">Удалить</span>
-          </button>
-        </div>
-      ) : null}
     </StylesProvider>
   )
 }

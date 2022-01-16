@@ -11,5 +11,5 @@ export interface Feedback {
 const feedbackCollectionName = 'feedback'
 
 export async function createFeedback(data: Feedback) {
-  await client.query(q.Create(q.Collection(feedbackCollectionName), {data}))
+  return client().query(q.Create(q.Collection(feedbackCollectionName), {data}))
 }
