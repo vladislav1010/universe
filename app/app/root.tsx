@@ -58,14 +58,12 @@ export default function App() {
 // TODO: customize below
 
 // https://remix.run/docs/en/v1/api/conventions#errorboundary
-export function ErrorBoundary({error}: {error: Error}) {
+export function ErrorBoundary() {
   return (
-    <Document title="Error!">
+    <Document title="Ошибка!">
       <Layout>
         <div>
-          <h1>There was an error</h1>
-          <p>{error.message}</p>
-          <p>{JSON.stringify(error.stack)}</p>
+          <h1>Произошла непредвиденная ошибка!</h1>
         </div>
       </Layout>
     </Document>
