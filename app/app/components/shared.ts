@@ -1,1 +1,1 @@
-export const mainLayoutClassName = 'px-2vw'
+export const mainLayoutClassName = 'px-[2vw]'
