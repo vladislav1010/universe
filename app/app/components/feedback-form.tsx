@@ -381,6 +381,15 @@ function FeedbackForm() {
           </div>
         </fieldset>
       </Form>
+      {actionData.success ? (
+        <p className="mt-8 text-lg">
+          Ваш запрос успешно доставлен{' '}
+          <span role="img" aria-label="Подмигивание">
+            😉
+          </span>
+          .
+        </p>
+      ) : null}
     </StylesProvider>
   )
 }

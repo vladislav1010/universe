@@ -2,6 +2,8 @@ import type {MetaFunction, LoaderFunction} from 'remix'
 import {json} from 'remix'
 import {i18n} from '../i18n.server'
 import * as React from 'react'
+import clsx from 'clsx'
+import {mainLayoutClassName} from '../components/shared'
 
 // Loaders provide data to components and are only ever called on the server, so
 // you can connect to a database or run any server side code you want right next
@@ -29,5 +31,9 @@ export const meta: MetaFunction = () => {
 // https://remix.run/guides/routing#index-routes
 export default function Index() {
   // TODO: remove color team className
-  return <main className="set-color-team-current-unknown" />
+  return (
+    <main
+      className={clsx('set-color-team-current-unknown', mainLayoutClassName)}
+    />
+  )
 }

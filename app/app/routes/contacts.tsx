@@ -7,6 +7,8 @@ import {
   loader as feedbackFormLoader,
   action as feedbackFormAction,
 } from '../components/feedback-form'
+import clsx from 'clsx'
+import {mainLayoutClassName} from '../components/shared'
 
 export const action = feedbackFormAction
 
@@ -39,7 +41,9 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   // TODO: remove color team className
   return (
-    <main className="set-color-team-current-unknown">
+    <main
+      className={clsx('set-color-team-current-unknown', mainLayoutClassName)}
+    >
       <FeedbackForm />
     </main>
   )
