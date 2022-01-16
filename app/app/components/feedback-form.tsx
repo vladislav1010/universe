@@ -110,7 +110,7 @@ export const loader: LoaderFunction = async () => {
   }
 }
 
-const attachmentImageLayoutClassName = 'w-40 h-40'
+const attachmentImageLayoutClassName = 'w-40 h-40 mt-4'
 
 const interestedIn = [
   'Site from scratch',
