@@ -21,7 +21,7 @@ account_id = "Ваш ACCOUNT_ID Cloudflare"
 CLOUDFLARE_ACCOUNT_ID = "Ваш ACCOUNT_ID Cloudflare"
 CLOUDFLARE_IMAGES_TOKEN = "" # В https://developers.cloudflare.com/images/cloudflare-images/api-request , "your Global API Key or API Token"
 FAUNA_SECRET = "" # В https://docs.fauna.com/fauna/current/learn/quick_start/client_quick_start?lang=javascript FAUNADB_SECRET
-FAUNA_DOMAIN = "db.fauna.com" # В https://docs.fauna.com/fauna/current/drivers/javascript#instantiating-a-client-and-issuing-queries
+FAUNA_DOMAIN = "" # В https://docs.fauna.com/fauna/current/drivers/javascript#instantiating-a-client-and-issuing-queries
 ```
 
 ## В разработке
