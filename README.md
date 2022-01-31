@@ -35,4 +35,4 @@ FAUNA_DOMAIN = "" # В https://docs.fauna.com/fauna/current/drivers/javascript#i
 
 ## Заимствование
 
-Т.к. я ни дизайнер, ни разработчик мирового уровня, взял цветовую схему и части кода из <https://github.com/kentcdodds/kentcdodds.com>
+Т.к. я ни дизайнер, ни разработчик мирового уровня, взял цветовую схему и части кода из <https://github.com/kentcdodds/kentcdodds.com>, <https://github.com/chakra-ui/chakra-ui>
